@@ -14,16 +14,17 @@ Delivered as a Claude plugin, `research-funding`. For a named researcher it buil
 
 **Claude desktop app / Cowork** (paid plan required):
 
-1. Download `research-funding-<version>.plugin` from the latest release on this repository's **Releases** page.
-2. In Claude, open **Customize** in the left sidebar (in Cowork, open the **Cowork** tab first) and go to **Plugins**.
-3. Upload the downloaded file. Plugins added this way are saved on your computer.
-4. Type `/start` in a new chat.
+1. In Claude, open **Customize** in the left sidebar (in Cowork, open the **Cowork** tab first) and go to **Plugins**.
+2. Click **Add** → **Add marketplace** → **Add from a repository**.
+3. Enter `madsberggreen/Horizon-Europe-Networking`.
+4. Open the **Discover** tab, select **research-funding** and click **Add**.
+5. Type `/start` in a new chat.
 
-To update, download the new file from Releases and upload it again.
+New versions arrive when you update the marketplace in the same **Plugins** tab.
 
-Adding this repository as a marketplace (**Plugins** → **Add** → **Add marketplace** → **Add from a repository** → `madsberggreen/Horizon-Europe-Networking`) only works reliably for public repositories. This repository is private, so use the file instead.
+**Alternative: install from a file.** Download `research-funding-<version>.plugin` from the latest release on the **Releases** page, then upload it under **Customize** → **Plugins**. To update, upload the new file.
 
-The repository is private. Colleagues need read access on GitHub (Settings → Collaborators) to download the file or install via Claude Code.
+If your organization restricts which marketplaces you may add, ask your Claude administrator to allow this repository or to add the plugin for everyone.
 
 ## Use
 
