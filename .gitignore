@@ -9,3 +9,6 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# Built plugin files (attached to GitHub releases, not committed)
+dist/
