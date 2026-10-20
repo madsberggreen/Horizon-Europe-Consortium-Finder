@@ -1,0 +1,11 @@
+# Workspace data: personal researcher data and downloaded datasets never go in the repository
+researchers/
+themes/
+cordis-data/
+*.pdf
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/

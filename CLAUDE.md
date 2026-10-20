@@ -8,7 +8,15 @@ Ejer: Mads Lykke Berggreen (GitHub: madsberggreen). Repository: https://github.c
 
 ## Status
 
-Projektet er lige startet (oktober 2026). Der er endnu ikke valgt teknologi, målgruppe eller funktioner. Det skal afklares med Mads, før der bygges noget.
+Første version deles som Claude-plugin (`plugins/research-funding`, v2.1.0), som kolleger installerer fra dette repository (`.claude-plugin/marketplace.json`). Senere overvejer Mads, om det skal blive en egentlig webapp. En færdig Lovable-byggeplan ligger i Cowork-projektet `OneDrive - ViaUC\Dokumenter\Claude\Projects\Horizon Europe Automated\Lovable-Import`.
+
+Pluginet kommer fra `plugin-src/research-funding` i samme Cowork-projekt, men **dette repository er nu den gældende version**. Ret her, ikke i Cowork-kopien.
+
+## Data — vigtigt
+
+- Forskerdata (CV'er, profiler, rapporter i `researchers/`) er personoplysninger og må aldrig commites. `.gitignore` blokerer `researchers/`, `themes/`, `cordis-data/` og PDF'er.
+- CORDIS-data hentes automatisk af `skills/cordis-analysis/scripts/download_cordis.py` fra https://cordis.europa.eu/data/ (ved første brug og når de er over 30 dage gamle). Læg aldrig CORDIS-filer i repositoriet.
+- Når version ændres, opdater både `plugins/research-funding/.claude-plugin/plugin.json` og `.claude-plugin/marketplace.json` samt ændringslisten i plugin-README'en.
 
 ## Arbejdsregler for dette projekt
 

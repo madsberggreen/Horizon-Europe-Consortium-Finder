@@ -1,0 +1,34 @@
+---
+description: Run the full researcher onboarding pipeline — profile, call-matching, Proposal Intelligence, CORDIS analysis, pitch letters, and HTML report — for a named researcher
+---
+
+# /add-researcher
+
+Triggered by a researcher name (optionally + institution): "Tilføj Anne Mette Frost", "Ny forsker: Maria Jensen, AAU", "Kør pipeline på Søren Dam". Runs the whole flow **without pausing for confirmation** — unless the researcher cannot be identified unambiguously, in which case: leave the profile template empty, ask the user for ORCID/department, and stop.
+
+## Pipeline (this order is deliberate — PI runs AFTER matching so it anchors on real calls)
+
+**0. CORDIS data check** — before anything else, run `python "${CLAUDE_PLUGIN_ROOT}/skills/cordis-analysis/scripts/download_cordis.py" --data-dir "<workspace>/cordis-data"` (the script sits in the `cordis-analysis` skill's `scripts/` folder). It downloads the official CORDIS extracts on first use and refreshes them when older than 30 days; otherwise it does nothing. Never ask the user to update CORDIS files by hand. If it exits 1, continue — step 5 falls back to web search.
+
+**1. Folders** — create `researchers/[Name]/{inbox,profile,calls,cordis,intelligence,pitches,reports}/`; copy `researchers/_template/profil.md` in and set the name. If the workspace has no `researchers/_template/profil.md`, create it first from the plugin's `templates/profil.md`.
+
+**2. Profile** — run `researcher-profiling` (institution from the message, else ask). Mark auto-fetched data `_(auto-hentet [date])_`. Save `profile/[name]-profile.md` and fill `profil.md`.
+
+**3. Call-matching** — run `horizon-matching` with the profile. Outputs `calls/[name]-calls-[YYYY-MM-DD].{md,pdf}`.
+
+**4. Proposal Intelligence** — run `intelligence-report` anchored on the top 3–5 matched calls (the skill reads `calls/*.md` itself). It checks the theme cache first and reuses a landscape under 60 days old. Outputs `intelligence/[name]-intelligence-[YYYY-MM-DD].{json,md,pdf}`.
+
+**5. CORDIS** — run `cordis-analysis` **once for the dominant thematic cluster of the shortlist** (twice only if the top calls split across two unrelated themes — never more). It also checks the theme cache first. Outputs `cordis/[name]-cordis-[YYYY-MM-DD].{md,pdf}`.
+
+**6. Pitch letters** — run `wp-pitch` for each of the Top-3 CORDIS coordinator candidates against the best-matching call. Outputs in `pitches/`.
+
+**7. HTML report** — run `html-report` (Type A). Output `reports/[name]-briefing-[YYYY-MM-DD].html` (link verification is built into the renderer).
+
+**8. Status message** in chat: profile summary (title, institution, core areas, ORCID), N calls matched + top match with score, PI themes mapped, N partner institutions found, links to the HTML report and PDFs, and any items awaiting manual verification (e.g. institutional HEU project links).
+
+## Rules
+
+- Never pause mid-run; never send emails or external messages without explicit approval; never modify an existing profile without a dated backup first.
+- All filenames use today's date `YYYY-MM-DD`; never overwrite existing outputs.
+- Order is fixed: matching before PI (PI anchors on matched calls); CORDIS capped at one thematic run.
+- PI and CORDIS reuse the shared theme cache in `themes/` when the landscape is <60 days old; the researcher-specific assessment and all pitch letters are always generated fresh. Report in step 8 which artifacts were reused and how old they were.
