@@ -9,7 +9,7 @@
       "displayName": "Horizon Europe Consortium Finder",
       "source": "./plugins/research-funding",
       "description": "Horizon Europe Consortium Finder: researcher profile, call matching, Proposal Intelligence, CORDIS partner analysis, WP pitch letters and HTML briefing report.",
-      "version": "2.5.1",
+      "version": "2.6.0",
       "author": {
         "name": "Mads Lykke Berggreen (madsberggreen)",
         "url": "https://github.com/madsberggreen"

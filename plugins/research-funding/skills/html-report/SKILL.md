@@ -21,7 +21,11 @@ Content rules per tab:
 2. **intelligence** — the five PI sections; COST Actions first among networks; portfolio as a table with linked acronyms.
 3. **calls** — scoring-note paragraph, top-matches table (score cells as "NN/20" — auto-badged), one "Why it fits" h3+ul per shortlisted call (policy anchors + recommended role), monitoring table. Call IDs and titles as markdown links to the topic page.
 4. **partners** — headline callout, candidate tables (institution linked, country, evidence, role fit), consortium-gaps list, brokerage-events summary.
-5. **actions** — time-phased to-do lists with concrete names and dates, a highest-leverage-action callout, and **exactly 3 `letter` blocks**, one per Top-3 organisation from the CORDIS "TOP COORDINATOR CANDIDATES" section:
+5. **actions** — time-phased to-do lists with concrete names and dates, a highest-leverage-action callout, and **exactly 3 `letter` blocks**. Write the to-do lists and the callout for the person who requested the run (`Requested by:` in the request, or the `Requested by:` line in `profil.md`; default Advisor):
+   - **Advisor** — addressed to a research advisor or grants officer who supports the researcher: refer to the researcher by name in the third person, and include the advisor's own steps (book a briefing meeting with the researcher, walk them through the findings, confirm their interest in each call, register them for brokerage events, update their profile afterwards).
+   - **Researcher** — addressed directly to the researcher as "you": no briefing or "confirm the researcher's interest" steps; instead concrete steps the researcher takes themself (choose the target call, review and send the pitch letters, contact the named coordinators, register for brokerage events, contact their own institution's research support office for budget and administrative help).
+   The pitch letters are always written by and signed by the researcher, whichever perspective is used.
+   Letter blocks, one per Top-3 organisation from the CORDIS "TOP COORDINATOR CANDIDATES" section:
    - Letter bodies come from `pitches/*.md` if present; otherwise invoke the **wp-pitch** skill to draft them (it owns the four-argument letter format — do not re-specify it here).
    - Fewer than 3 ranked organisations → still render 3 letter blocks, marking missing ones with `"insufficient_data": true`. Never silently drop a letter.
    - Each letter block: `chips` (CORDIS rank, relevance ratio, EU experience), `policy_note` linking the PI document cited.

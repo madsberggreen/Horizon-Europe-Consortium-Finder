@@ -1,6 +1,10 @@
-# research-funding v2.5.1
+# research-funding v2.6.0
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.6.0
+
+- **Who is asking.** Under the researcher's name the form offers "I am working on behalf of this researcher" (default) or "That's me!". The request carries `Requested by: Advisor | Researcher`; with Researcher, the Action Plan in the HTML report addresses the researcher directly as "you" instead of an advisor. Pitch letters are unchanged.
 
 ## What changed in v2.5.1
 

@@ -23,7 +23,7 @@ If — and only if — there is no `show_widget` tool, ask in plain text for nam
 
 ## When the request arrives
 
-The form's message starts with `Find me a consortium!` followed by `Mode:`, `Name:`, `Institution:`, optional `ORCID:`, and in Advanced mode `Research idea:` / `Document:` blocks between `<<<` and `>>>`. Treat it as an `/add-researcher` request in that format and run the full `add-researcher` pipeline of this plugin (the `add-researcher` command or skill), starting at step 0, without asking for confirmation. Documents the user attached in the chat instead (plain-text fallback) count as `Document:` blocks.
+The form's message starts with `Find me a consortium!` followed by `Mode:`, `Name:`, `Institution:`, `Requested by:` (`Advisor` or `Researcher`), optional `ORCID:`, and in Advanced mode `Research idea:` / `Document:` blocks between `<<<` and `>>>`. Treat it as an `/add-researcher` request in that format and run the full `add-researcher` pipeline of this plugin (the `add-researcher` command or skill), starting at step 0, without asking for confirmation. Documents the user attached in the chat instead (plain-text fallback) count as `Document:` blocks.
 
 Where there is no persistent workspace folder (for example a regular chat), work in the current working directory and give the user the HTML report and PDFs as downloadable files at the end.
 
@@ -54,6 +54,10 @@ Where there is no persistent workspace folder (for example a regular chat), work
     <label for="cf-name">Who is the researcher?</label>
     <input type="text" id="cf-name" placeholder="Anne Jensen" style="width:100%">
     <p class="cf-err" id="cf-name-err" hidden>Enter the researcher's name.</p>
+    <div role="radiogroup" aria-label="Who is using this tool" style="display:flex;flex-wrap:wrap;gap:6px 20px;font-size:14px;padding-top:2px">
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-weight:400"><input type="radio" name="cf-who" id="cf-who-adv" value="advisor" checked>I am working on behalf of this researcher</label>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-weight:400"><input type="radio" name="cf-who" id="cf-who-self" value="researcher">That's me!</label>
+    </div>
   </div>
   <div class="cf-f">
     <label for="cf-inst">Which institution?</label>
@@ -135,7 +139,7 @@ if(adv&&!$("cf-consent").checked){show("cf-consent-err",true);ok=false}
 if(adv&&$("cf-consent").checked&&!idea&&!ready.length){show("cf-adv-err",true);ok=false}
 if(docs.some(function(d){return d.loading})){$("cf-status").textContent="Wait until the documents have been read.";ok=false}
 if(!ok)return;
-var L=["Find me a consortium!","Mode: "+(adv?"Advanced":"Simple"),"Name: "+name,"Institution: "+inst];
+var L=["Find me a consortium!","Mode: "+(adv?"Advanced":"Simple"),"Name: "+name,"Institution: "+inst,"Requested by: "+($("cf-who-self").checked?"Researcher":"Advisor")];
 if(o)L.push("ORCID: "+o);
 if(adv){if(idea)L.push("Research idea:","<<<",idea,">>>");ready.forEach(function(d){L.push("Document: "+d.name,"<<<",d.text,">>>")})}
 var msg=L.join("\n");

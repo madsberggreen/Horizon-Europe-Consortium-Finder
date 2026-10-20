@@ -15,6 +15,7 @@ Requests from the `/start` form look like this:
 Mode: Simple | Advanced
 Name: …
 Institution: …
+Requested by: Advisor | Researcher
 ORCID: … (optional)
 Research idea:
 <<<
@@ -26,7 +27,7 @@ extracted text
 >>>
 ```
 
-`Research idea` and `Document` blocks appear only in Advanced mode (zero or more documents). A request without a `Mode:` line is **Simple**. The in-chat form from `/start` sends the same format with `Find me a consortium!` as its first line instead of `/add-researcher`.
+`Research idea` and `Document` blocks appear only in Advanced mode (zero or more documents). A request without a `Mode:` line is **Simple**. `Requested by:` says who will read the results: **Advisor** (default — someone working on behalf of the researcher) or **Researcher** (the researcher themself). It decides the perspective of the Action Plan (see `html-report`) and of the status message in step 8; save it in `profil.md` under Notater til grant-strategi as `Requested by: …`. The in-chat form from `/start` sends the same format with `Find me a consortium!` as its first line instead of `/add-researcher`.
 
 - **Simple** — public data only: ORCID, institutional pages, CORDIS, EU portals and web search. Do not read files in the researcher's folder. Every output states "Based on publicly available data only."
 - **Advanced** — the user's idea and documents steer the whole run. Save them in step 1, then use them in profiling (step 2), call-matching (step 3), Proposal Intelligence (step 4) and pitch letters (step 6), as each skill's "Advanced mode" section describes. The user's material is confidential: use it to shape content, never quote it at length in outputs, and never copy evaluator comments from rejected applications into anything meant for third parties.
