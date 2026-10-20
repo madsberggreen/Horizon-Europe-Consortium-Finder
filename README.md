@@ -17,10 +17,16 @@ Delivered as a Claude plugin, `research-funding`. For a named researcher it buil
 1. In Claude, open **Customize** in the left sidebar (in Cowork, open the **Cowork** tab first) and go to **Plugins**.
 2. Click **Add** → **Add marketplace** → **Add from a repository**.
 3. Enter `madsberggreen/Horizon-Europe-Consortium-Finder`.
-4. Open the **Discover** tab, select **research-funding** and click **Add**.
+4. Open the **Discover** tab and look for the plugin named **research-funding** (described as "Horizon Europe Consortium Finder"). It is listed among the plugins from Anthropic's own catalog, so search for `research-funding` if you don't see it. Select it and click **Install**.
 5. Type `/start` in a new chat.
 
-New versions arrive when you update the marketplace in the same **Plugins** tab.
+New versions arrive when you select **Check for updates** on the marketplace on the same **Plugins** page, or turn on **Sync automatically**.
+
+**Can't find it?**
+- Search for `research-funding`, not "Consortium Finder".
+- Check that the marketplace was added: it should be listed on the **Plugins** page. If adding it failed, your organization may restrict which marketplaces you can add. Ask your Claude administrator, or install from a file (below).
+- Select **Check for updates** on the marketplace, then look again.
+- Cowork requires a paid plan (Pro, Max, Team or Enterprise).
 
 **Alternative: install from a file.** Download `research-funding-<version>.plugin` from the latest release on the **Releases** page, then upload it under **Customize** → **Plugins**. To update, upload the new file.
 
