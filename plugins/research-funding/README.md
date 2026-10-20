@@ -1,6 +1,10 @@
-# research-funding v2.4.0
+# research-funding v2.4.1
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.4.1
+
+- Placeholders and examples no longer mention VIA. UCviden is searched only for researchers at VIA University College ("VIA", "VIA UC" or "VIA University College"); other institutions use their own public research portal.
 
 ## What changed in v2.4.0
 

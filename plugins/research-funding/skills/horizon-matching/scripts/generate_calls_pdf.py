@@ -7,7 +7,7 @@ Usage:
 
 Input JSON schema:
 {
-  "researcher": "Name", "institution": "VIA University College",
+  "researcher": "Name", "institution": "Institution",
   "generated": "YYYY-MM-DD",
   "shortlist": [                      # score >= 14, sorted desc
     {"identifier": "...", "title": "...", "url": "...", "score": 17,

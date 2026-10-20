@@ -9,7 +9,7 @@ Usage:
 content.json schema:
 {
   "researcher": "Name", "subtitle": "Institution · Title · Generated YYYY-MM-DD",
-  "footer_sources": "ucviden.dk, ORCID ..., CORDIS, EU Funding & Tenders Portal",
+  "footer_sources": "ORCID ..., institutional portal, CORDIS, EU Funding & Tenders Portal",
   "generated": "YYYY-MM-DD",
   "tabs": {                      # five fixed tabs, each a list of blocks
     "profile": [...], "intelligence": [...], "calls": [...],

@@ -5,7 +5,7 @@ description: Builds a structured funding profile for a researcher at any institu
 
 # Researcher Profiling
 
-Builds a structured researcher interest profile from local project files plus ORCID/UCviden (Pure) publication data. Always the first step before matching against funding opportunities.
+Builds a structured researcher interest profile from local project files plus ORCID and institutional publication data. Always the first step before matching against funding opportunities.
 
 ## Mode
 
@@ -20,7 +20,7 @@ Builds a structured researcher interest profile from local project files plus OR
 ## Execute
 
 1. **Local files** (Advanced mode only) — scan the researcher's folder: previous applications (research questions, methods, keywords, impact), preliminary findings/working papers (core claims, disciplines, empirical focus), CVs/bios (career stage, affiliation, collaborators).
-2. **External data** — query ORCID (last 10 years: titles, journals, keywords, co-author institutions); supplement with UCviden by name + institution if available. If no unambiguous match is found, stop and ask the user for ORCID/department rather than guessing.
+2. **External data** — query ORCID (last 10 years: titles, journals, keywords, co-author institutions); supplement with the institution's own public research portal or staff page if one exists. **UCviden (ucviden.dk) only when the institution is VIA University College** — written as "VIA", "VIA UC" or "VIA University College" (any capitalisation); never search UCviden for any other institution. If no unambiguous match is found, stop and ask the user for ORCID/department rather than guessing.
 3. **Synthesise** into this structure:
 
 ```

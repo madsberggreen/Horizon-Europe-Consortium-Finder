@@ -34,7 +34,7 @@ If your organization restricts which marketplaces you may add, ask your Claude a
 
 You can also type commands directly in a workspace folder, for example:
 
-- `/add-researcher Anne Jensen, VIA University College` runs the full pipeline for one researcher.
+- `/add-researcher Anne Jensen, <institution>` runs the full pipeline for one researcher.
 - `/update-profiles` runs the full pipeline for every new folder you have created under `researchers/`. Existing researchers are left untouched.
 
 Nothing runs automatically: a report is only generated when you ask for it.
