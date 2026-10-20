@@ -1,14 +1,29 @@
 {
   "name": "horizon-europe-consortium-finder",
   "owner": {
-    "name": "Mads Lykke Berggreen"
+    "name": "Mads Lykke Berggreen (madsberggreen)"
   },
   "plugins": [
     {
       "name": "research-funding",
+      "displayName": "Horizon Europe Consortium Finder",
       "source": "./plugins/research-funding",
       "description": "Horizon Europe Consortium Finder: researcher profile, call matching, Proposal Intelligence, CORDIS partner analysis, WP pitch letters and HTML briefing report.",
-      "version": "2.5.0"
+      "version": "2.5.1",
+      "author": {
+        "name": "Mads Lykke Berggreen (madsberggreen)",
+        "url": "https://github.com/madsberggreen"
+      },
+      "keywords": [
+        "horizon europe",
+        "consortium",
+        "consortium finder",
+        "research funding",
+        "eu funding",
+        "cordis",
+        "grant",
+        "madsberggreen"
+      ]
     }
   ]
 }

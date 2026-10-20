@@ -1,6 +1,10 @@
-# research-funding v2.5.0
+# research-funding v2.5.1
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.5.1
+
+- Display name **Horizon Europe Consortium Finder**, author Mads Lykke Berggreen (madsberggreen) and search keywords added to `plugin.json` and the marketplace entry, so the plugin can be found by those names. The technical name stays `research-funding`.
 
 ## What changed in v2.5.0
 

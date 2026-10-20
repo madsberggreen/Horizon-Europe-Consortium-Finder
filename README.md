@@ -17,15 +17,14 @@ Delivered as a Claude plugin, `research-funding`. For a named researcher it buil
 1. In Claude, open **Customize** in the left sidebar (in Cowork, open the **Cowork** tab first) and go to **Plugins**.
 2. Click **Add** → **Add marketplace** → **Add from a repository**.
 3. Enter `madsberggreen/Horizon-Europe-Consortium-Finder`.
-4. Open the **Discover** tab and look for the plugin named **research-funding** (described as "Horizon Europe Consortium Finder"). It is listed among the plugins from Anthropic's own catalog, so search for `research-funding` if you don't see it. Select it and click **Install**.
-5. Type `/start` in a new chat.
+4. Open the **Discover** tab and search for **Horizon Europe Consortium Finder** (technical name `research-funding`). Select it and click **Add**.
+5. Type `/start` in a new chat. In Cowork the full command is `/research-funding:start`.
 
-New versions arrive when you select **Check for updates** on the marketplace on the same **Plugins** page, or turn on **Sync automatically**.
+**Updates** come from the marketplace, not from the plugin itself: on the **Plugins** page, select **Check for updates** on the marketplace `horizon-europe-consortium-finder`, or turn on **Sync automatically** so new versions arrive without you doing anything.
 
 **Can't find it?**
-- Search for `research-funding`, not "Consortium Finder".
+- Select **Check for updates** on the marketplace first. A marketplace added before version 2.5.1 only knows the plugin as `research-funding` until it has been updated.
 - Check that the marketplace was added: it should be listed on the **Plugins** page. If adding it failed, your organization may restrict which marketplaces you can add. Ask your Claude administrator, or install from a file (below).
-- Select **Check for updates** on the marketplace, then look again.
 - Cowork requires a paid plan (Pro, Max, Team or Enterprise).
 
 **Alternative: install from a file.** Download `research-funding-<version>.plugin` from the latest release on the **Releases** page, then upload it under **Customize** → **Plugins**. To update, upload the new file.
