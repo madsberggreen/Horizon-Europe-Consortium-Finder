@@ -1,4 +1,4 @@
-# Horizon-Europe-Networking
+# Horizon Europe Consortium Finder
 App that helps you identify and join a Horizon Europe consortium as a researcher
 
 Delivered as a Claude plugin, `research-funding`. For a named researcher it builds a funding profile, matches open Horizon Europe calls, writes a Proposal Intelligence briefing, finds consortium partners in CORDIS, drafts work package lead pitch letters and combines everything in one HTML report.
@@ -8,15 +8,15 @@ Delivered as a Claude plugin, `research-funding`. For a named researcher it buil
 **Claude Code** (type in the chat):
 
 ```
-/plugin marketplace add madsberggreen/Horizon-Europe-Networking
-/plugin install research-funding@horizon-europe-networking
+/plugin marketplace add madsberggreen/Horizon-Europe-Consortium-Finder
+/plugin install research-funding@horizon-europe-consortium-finder
 ```
 
 **Claude desktop app / Cowork** (paid plan required):
 
 1. In Claude, open **Customize** in the left sidebar (in Cowork, open the **Cowork** tab first) and go to **Plugins**.
 2. Click **Add** → **Add marketplace** → **Add from a repository**.
-3. Enter `madsberggreen/Horizon-Europe-Networking`.
+3. Enter `madsberggreen/Horizon-Europe-Consortium-Finder`.
 4. Open the **Discover** tab, select **research-funding** and click **Add**.
 5. Type `/start` in a new chat.
 

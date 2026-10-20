@@ -1,10 +1,10 @@
-# CLAUDE.md — Horizon-Europe-Networking
+# CLAUDE.md — Horizon Europe Consortium Finder
 
 ## Hvad projektet er
 
 En app, der hjælper forskere med at finde og komme ind i et Horizon Europe-konsortium.
 
-Ejer: Mads Lykke Berggreen (GitHub: madsberggreen). Repository: https://github.com/madsberggreen/Horizon-Europe-Networking (privat).
+Ejer: Mads Lykke Berggreen (GitHub: madsberggreen). Repository: https://github.com/madsberggreen/Horizon-Europe-Consortium-Finder (offentligt).
 
 ## Status
 
