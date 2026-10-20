@@ -11,6 +11,10 @@ A one-page (A4) PDF mapping the EU policy landscape for a research theme, in fiv
 
 **In the pipeline this skill runs AFTER call-matching.** Read the researcher's latest `calls/*.md` and anchor all five sections on the top 3–5 matched calls and their expected outcomes — not the researcher's general field. Standalone (no calls file): anchor on the theme the user gives, or ask for it.
 
+**Advanced mode** (profile has an INTENDED DIRECTION section): also anchor on the user's idea. Whether the landscape was reused from the theme cache or researched fresh, add a sixth, researcher-specific section **YOUR IDEA IN THIS LANDSCAPE** (2–4 entries; `url` optional): which key documents and expected outcomes the idea answers most directly, which network or project from sections 2–3 it should connect to, and the policy argument to use in pitch letters. Never store this section in the theme cache. If the page overflows, apply the single-page trimming rules to sections 3 and 5 first.
+
+**Simple mode:** set `title_line2` to end with "· Based on publicly available data only".
+
 ## Check the theme cache first (do this before any web research)
 
 All five sections describe a **theme landscape**, not a person — two researchers in the same subtheme need the same policy documents, COST Actions, DGs and brokerage events. Check whether it already exists:

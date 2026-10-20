@@ -38,7 +38,7 @@ Timing: if the deadline is <60 days away, add `deadline_flag`: "Closing in <60 d
 
 ## Step 4 — Match rationale (the judgment step)
 
-Per shortlisted call, 2–4 unique sentences that (a) name THIS call's specific scope/expected outcomes and (b) name the researcher's specific projects, methods, or publications that create the fit. Boilerplate ("strong overlap with digital themes") is forbidden. Every policy document or CORDIS project mentioned is a markdown link.
+Per shortlisted call, 2–4 unique sentences that (a) name THIS call's specific scope/expected outcomes and (b) name the researcher's specific projects, methods, or publications that create the fit. **Advanced mode** (profile has an INTENDED DIRECTION section): include the `(idea)` keywords in the sweep, score fit to the idea as well as to the track record, and add one sentence per call on how the idea fits (or "fits the track record, not the idea"). Boilerplate ("strong overlap with digital themes") is forbidden. Every policy document or CORDIS project mentioned is a markdown link.
 
 ## Step 5 — Save outputs
 

@@ -1,6 +1,10 @@
-# research-funding v2.2.0
+# research-funding v2.3.0
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.3.0
+
+- **Simple and Advanced mode.** `/add-researcher` accepts the structured request built by the start page (`app/index.html`). Simple uses public data only and says so in every output. Advanced saves the user's idea and documents to `inbox/user-input-[date].md` and uses them in researcher-profiling (INTENDED DIRECTION section, `(idea)` keywords), horizon-matching (idea fit), intelligence-report (YOUR IDEA IN THIS LANDSCAPE section, never cached) and wp-pitch (concrete contribution to the quoted expected outcome).
 
 ## What changed in v2.2.0
 

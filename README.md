@@ -18,7 +18,9 @@ The repository is private. Colleagues need read access on GitHub (Settings → C
 
 ## Use
 
-Open a folder to work in (your workspace) and type, for example:
+**Easiest: the start page.** Open https://claude.ai/artifact/R1rkx8dabe6gKRKpYNZ43E, choose **Simple search** (name, institution, optional ORCID; public data only) or **Advanced search** (adds your research idea and documents such as rejected applications or one-pagers), click **Copy request** and paste it into Claude. In Advanced mode your input shapes the profile, the call matching, the policy briefing and the pitch letters. Documents are read in your browser and only reach Claude when you paste the request. The page's source is `app/index.html`.
+
+You can also type commands directly in a workspace folder, for example:
 
 - `/add-researcher Anne Jensen, VIA University College` runs the full pipeline for one researcher.
 - `/update-profiles` runs the full pipeline for every new folder you have created under `researchers/`. Existing researchers are left untouched.

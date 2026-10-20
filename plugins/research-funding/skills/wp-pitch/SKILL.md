@@ -13,6 +13,9 @@ Drafts an outreach letter **from the researcher to a likely coordinator**, posit
 2. `calls/*.md` — the target call; copy expected outcomes **verbatim**
 3. `cordis/*.md` — recipient organisation, their projects, "KEY CONTACTS — OUTREACH TARGETS"
 4. `intelligence/*.md` — Key Documents / Impact-on-Policy entries touching this call
+5. **Advanced mode only:** the profile's INTENDED DIRECTION section, the newest `inbox/user-input-*.md`, and the PI section YOUR IDEA IN THIS LANDSCAPE
+
+**Advanced mode changes Argument 2:** replace the general method claim with a concrete contribution built from the user's notes — for the quoted expected outcome, say in 2–3 sentences what I would do (activity, method, data or setting), what it delivers (deliverable type) and how that addresses the outcome. Same ≤400-word limit; shorten Arguments 3–4 if needed. Use the user's ideas, not their wording; never mention rejected applications or evaluator feedback.
 
 For each argument below, note the specific evidence + URL before writing prose. Missing evidence → address the gap honestly in the letter (Arguments 1/2/4) or omit (Argument 3). Never fabricate.
 

@@ -17,7 +17,7 @@ Schema and block types (`h3`, `p`, `kv`, `ul`/`ol`, `table`, `callout`, `pills`,
 
 Content rules per tab:
 
-1. **profile** — kv block (name, title, institution, ORCID as link, career stage), research areas, methods, keyword pills, current projects, EU-funding history.
+1. **profile** — kv block (name, title, institution, ORCID as link, career stage), research areas, methods, keyword pills, current projects, EU-funding history. Start the tab with a `callout` stating the sources: "Based on publicly available data only" (Simple mode) or "Based on public data and your own input: [file names]" (Advanced mode). In Advanced mode, add the INTENDED DIRECTION section right after the kv block.
 2. **intelligence** — the five PI sections; COST Actions first among networks; portfolio as a table with linked acronyms.
 3. **calls** — scoring-note paragraph, top-matches table (score cells as "NN/20" — auto-badged), one "Why it fits" h3+ul per shortlisted call (policy anchors + recommended role), monitoring table. Call IDs and titles as markdown links to the topic page.
 4. **partners** — headline callout, candidate tables (institution linked, country, evidence, role fit), consortium-gaps list, brokerage-events summary.

@@ -8,7 +8,7 @@
       "name": "research-funding",
       "source": "./plugins/research-funding",
       "description": "Horizon Europe pipeline: researcher profile, call matching, Proposal Intelligence, CORDIS partner analysis, WP pitch letters and HTML briefing report.",
-      "version": "2.2.0"
+      "version": "2.3.0"
     }
   ]
 }
