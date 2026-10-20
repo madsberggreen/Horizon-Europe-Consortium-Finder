@@ -1,6 +1,10 @@
-# research-funding v2.1.0
+# research-funding v2.2.0
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.2.0
+
+- **Reports on request only.** `/update-profiles` is no longer a weekly scheduled sweep. It now only runs the onboarding pipeline for new researcher folders; inbox processing, re-matching, theme-cache refresh, report regeneration and the weekly status overview were removed.
 
 ## What changed in v2.1.0
 

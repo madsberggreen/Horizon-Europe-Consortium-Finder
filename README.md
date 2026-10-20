@@ -21,7 +21,9 @@ The repository is private. Colleagues need read access on GitHub (Settings → C
 Open a folder to work in (your workspace) and type, for example:
 
 - `/add-researcher Anne Jensen, VIA University College` runs the full pipeline for one researcher.
-- `/update-profiles` processes new files in every researcher's `inbox/` folder and updates their reports.
+- `/update-profiles` runs the full pipeline for every new folder you have created under `researchers/`. Existing researchers are left untouched.
+
+Nothing runs automatically: a report is only generated when you ask for it.
 
 Everything is saved in the workspace:
 

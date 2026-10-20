@@ -1,7 +1,7 @@
 {
   "name": "research-funding",
   "description": "Identifies funding opportunities in Horizon Europe, matches them to researcher profiles, and generates Proposal Intelligence reports and consortium pitch materials.",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": {
     "name": "Mads Lykke Berggreen"
   },

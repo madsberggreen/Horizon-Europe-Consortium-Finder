@@ -36,7 +36,3 @@ python "<skill-dir>/scripts/build_report.py" content.json \
 ```
 
 Always today's date in the filename; never overwrite an existing report. The file is fully self-contained (works from OneDrive/SharePoint double-click).
-
-## Type B — Weekly Status Overview
-
-For `/update-profiles` runs: same builder, but one tab ("profile") holding a summary table across researchers (name, top call linked, score badge, last updated, status) plus an action-items callout and a deadline table. Save as `reports/weekly-status-[YYYY-MM-DD].html`.

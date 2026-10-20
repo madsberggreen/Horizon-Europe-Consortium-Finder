@@ -22,7 +22,7 @@ Triggered by a researcher name (optionally + institution): "Tilføj Anne Mette F
 
 **6. Pitch letters** — run `wp-pitch` for each of the Top-3 CORDIS coordinator candidates against the best-matching call. Outputs in `pitches/`.
 
-**7. HTML report** — run `html-report` (Type A). Output `reports/[name]-briefing-[YYYY-MM-DD].html` (link verification is built into the renderer).
+**7. HTML report** — run `html-report`. Output `reports/[name]-briefing-[YYYY-MM-DD].html` (link verification is built into the renderer).
 
 **8. Status message** in chat: profile summary (title, institution, core areas, ORCID), N calls matched + top match with score, PI themes mapped, N partner institutions found, links to the HTML report and PDFs, and any items awaiting manual verification (e.g. institutional HEU project links).
 
