@@ -1,444 +1,56 @@
 <meta charset="utf-8">
 <title>Consortium Finder</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400&display=swap">
 <style>
-/* Layout: two panes — the form you fill (left) and the exact request Claude receives (right, sticky). Stacks on phones. */
+/* Layout: one centred column — name, the one instruction, install steps. */
 :root {
-  --bg: #f3f5f4;
-  --surface: #ffffff;
-  --ink: #17242a;
-  --muted: #5a6b70;
-  --line: #d5dddc;
-  --accent: #1d5c63;
-  --accent-ink: #ffffff;
-  --accent-soft: #e1eeee;
-  --warn-bg: #fbf1dc;
-  --warn-ink: #6b4a08;
-  --warn-line: #e6c77d;
-  --ok: #2f6b3a;
-  --err: #a2342b;
-  --code-bg: #eaefee;
+  --bg: #f3f5f4; --surface: #ffffff; --ink: #17242a; --muted: #5a6b70; --line: #d5dddc;
+  --accent: #1d5c63; --code-bg: #e1eeee;
   --font-display: "Familjen Grotesk", "Segoe UI", system-ui, sans-serif;
   --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #111a1d; --surface: #182428; --ink: #e4ecec; --muted: #9db0b2; --line: #2c3d42;
-    --accent: #6fb6bd; --accent-ink: #0d1a1d; --accent-soft: #1d3338;
-    --warn-bg: #2f2612; --warn-ink: #f0d596; --warn-line: #6b5521;
-    --ok: #86c793; --err: #f08b80; --code-bg: #0f171a;
-    color-scheme: dark;
-  }
+  :root:not([data-theme="light"]) { --bg: #111a1d; --surface: #182428; --ink: #e4ecec; --muted: #9db0b2; --line: #2c3d42; --accent: #6fb6bd; --code-bg: #1d3338; color-scheme: dark; }
 }
-:root[data-theme="dark"] {
-  --bg: #111a1d; --surface: #182428; --ink: #e4ecec; --muted: #9db0b2; --line: #2c3d42;
-  --accent: #6fb6bd; --accent-ink: #0d1a1d; --accent-soft: #1d3338;
-  --warn-bg: #2f2612; --warn-ink: #f0d596; --warn-line: #6b5521;
-  --ok: #86c793; --err: #f08b80; --code-bg: #0f171a;
-  color-scheme: dark;
-}
+:root[data-theme="dark"] { --bg: #111a1d; --surface: #182428; --ink: #e4ecec; --muted: #9db0b2; --line: #2c3d42; --accent: #6fb6bd; --code-bg: #1d3338; color-scheme: dark; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body {
-  background: var(--bg); color: var(--ink);
-  font-family: var(--font-body); font-size: 16px; line-height: 1.55;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 32px 48px;
+  background: var(--bg); color: var(--ink); font: 400 17px/1.6 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 48px;
 }
-.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 28px; }
-header { display: grid; gap: 6px; max-width: 70ch; }
-.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
-h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4.5vw, 42px); line-height: 1.1; margin: 0; text-wrap: balance; }
-h2 { font-family: var(--font-display); font-weight: 600; font-size: 20px; margin: 0; }
-h3 { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin: 0; }
+main { max-width: 640px; margin: 0 auto; display: grid; gap: 24px; }
+.eyebrow { font: 400 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font: 700 clamp(30px, 5vw, 40px)/1.1 var(--font-display); margin: 0; text-wrap: balance; }
+h2 { font: 600 19px var(--font-display); margin: 0; }
 p { margin: 0; }
-.lede { color: var(--muted); font-size: 17px; }
-
-.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
-@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
-
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 22px; display: grid; gap: 20px; min-width: 0; }
-.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; min-width: 0; }
-@media (max-width: 860px) { .side { position: static; } }
-
-/* Mode switch */
-.switch { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 8px; padding: 4px; gap: 4px; background: var(--bg); }
-.switch button {
-  font: 600 15px var(--font-display); border: 0; border-radius: 6px; padding: 10px 8px; cursor: pointer;
-  background: transparent; color: var(--muted);
-}
-.switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.switch button:focus-visible, .btn:focus-visible, input:focus-visible, textarea:focus-visible, .drop:focus-visible, .x:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-.mode-note { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; color: var(--muted); }
-.chip { font: 500 12px var(--font-mono); letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
-
-.fields { display: grid; gap: 16px; }
-.field { display: grid; gap: 6px; }
-label { font-weight: 600; font-size: 15px; }
-.opt { font-weight: 400; color: var(--muted); }
-input[type="text"], textarea {
-  width: 100%; font: 400 16px var(--font-body); color: var(--ink); background: var(--surface);
-  border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px;
-}
-textarea { min-height: 150px; resize: vertical; }
-input::placeholder, textarea::placeholder { color: var(--muted); opacity: .75; }
-.hint { font-size: 14px; color: var(--muted); }
-.hint.err { color: var(--err); }
-.hint.ok { color: var(--ok); }
-
-.advanced { display: grid; gap: 16px; border-top: 1px solid var(--line); padding-top: 20px; }
-.warning { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid var(--warn-line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; }
-.warning strong { font-family: var(--font-display); }
-.check { display: flex; gap: 10px; align-items: flex-start; font-weight: 600; font-size: 15px; cursor: pointer; }
-.check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex: none; }
-
-.locked { opacity: .45; pointer-events: none; }
-.drop {
-  border: 2px dashed var(--line); border-radius: 8px; padding: 22px 16px; text-align: center; cursor: pointer;
-  display: grid; gap: 4px; color: var(--muted); background: var(--bg);
-}
-.drop.over { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
-.drop b { color: var(--ink); }
-.files { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.files li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
-.files .name { font-weight: 600; overflow-wrap: anywhere; }
-.files .meta { font-size: 13px; color: var(--muted); }
-.files .meta.err { color: var(--err); }
-.x { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 6px; padding: 4px 10px; cursor: pointer; font: 600 13px var(--font-body); }
-
-/* Request preview */
-.preview-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.btn { font: 600 15px var(--font-display); border: 0; border-radius: 6px; padding: 11px 18px; cursor: pointer; background: var(--accent); color: var(--accent-ink); }
-.btn[disabled] { opacity: .45; cursor: not-allowed; }
-pre.request {
-  margin: 0; font: 400 13px/1.6 var(--font-mono); background: var(--code-bg); color: var(--ink);
-  border-radius: 6px; padding: 14px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 360px; overflow-y: auto;
-}
-pre.request .dim { color: var(--muted); }
-.status { font-size: 14px; min-height: 1.4em; }
-.status.ok { color: var(--ok); }
-.status.err { color: var(--err); }
-textarea.fallback { font: 400 12px var(--font-mono); min-height: 120px; }
-
-.steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 15px; }
-.outputs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 15px; }
-.outputs li { display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 8px; }
-.outputs code { font: 400 12px var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
-.fmt { font: 500 12px var(--font-mono); color: var(--accent); padding-top: 2px; }
-footer { color: var(--muted); font-size: 14px; max-width: 75ch; }
-footer a { color: var(--accent); }
-@media (prefers-reduced-motion: no-preference) { .switch button, .drop { transition: background .15s, color .15s, border-color .15s; } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 22px; display: grid; gap: 12px; }
+.cmd { font: 400 22px var(--font-mono); background: var(--code-bg); color: var(--accent); border-radius: 6px; padding: 10px 16px; justify-self: start; }
+ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+code { font: 400 14px var(--font-mono); background: var(--code-bg); padding: 1px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+.muted { color: var(--muted); font-size: 15px; }
+a { color: var(--accent); }
 </style>
-
-<div class="wrap">
-  <header>
+<main>
+  <div style="display:grid;gap:8px">
     <span class="eyebrow">research-funding plugin for Claude</span>
-    <h1>Find your Horizon Europe consortium</h1>
-    <p class="lede">Fill in the form, copy the request and paste it into Claude. You get matched open calls, a policy briefing, consortium partners from CORDIS and three draft pitch letters to coordinators.</p>
-  </header>
-
-  <div class="grid">
-    <form class="panel" id="form" novalidate>
-      <div class="switch" role="group" aria-label="Search type">
-        <button type="button" id="mode-simple" aria-pressed="true">Simple search</button>
-        <button type="button" id="mode-advanced" aria-pressed="false">Advanced search</button>
-      </div>
-
-      <p class="mode-note" id="note-simple"><span class="chip">Public data</span><span>Uses only publicly available data: ORCID, institutional pages, CORDIS and the EU Funding &amp; Tenders Portal.</span></p>
-      <p class="mode-note" id="note-advanced" hidden><span class="chip">Your input</span><span>Adds your own idea and documents. They steer the profile, the policy briefing and the pitch letters, so the results can point to a field beyond your usual one.</span></p>
-
-      <div class="fields">
-        <div class="field">
-          <label for="name">Researcher name</label>
-          <input type="text" id="name" autocomplete="name" placeholder="e.g. Anne Jensen">
-        </div>
-        <div class="field">
-          <label for="institution">Institution</label>
-          <input type="text" id="institution" autocomplete="organization" placeholder="Name of your research institution">
-        </div>
-        <div class="field">
-          <label for="orcid">ORCID iD <span class="opt">(optional)</span></label>
-          <input type="text" id="orcid" inputmode="text" placeholder="0000-0002-1825-0097" aria-describedby="orcid-hint">
-          <p class="hint" id="orcid-hint">Helps Claude find the right person when names are common.</p>
-        </div>
-      </div>
-
-      <section class="advanced" id="advanced" hidden aria-label="Advanced search">
-        <div class="warning" role="note">
-          <strong>Before you add anything</strong>
-          <p>Check your institutional guidelines on AI use before uploading any data. Only upload data that you or your institution has full ownership of.</p>
-          <label class="check" for="consent"><input type="checkbox" id="consent"> I have checked the guidelines, and I or my institution own the material I add.</label>
-        </div>
-
-        <div id="adv-body" class="fields locked" aria-disabled="true">
-          <div class="field">
-            <label for="idea">Your research idea</label>
-            <textarea id="idea" placeholder="What do you want to work on? Which problem, which methods, which setting? It is fine if it differs from your previous research." disabled></textarea>
-          </div>
-          <div class="field">
-            <span id="drop-label" style="font-weight:600;font-size:15px">Documents <span class="opt">(optional: rejected applications, one-pagers, concept notes)</span></span>
-            <div class="drop" id="drop" tabindex="-1" role="button" aria-labelledby="drop-label">
-              <span><b>Drop files here</b> or click to choose</span>
-              <span class="hint">PDF, Word (.docx), .txt or .md. The text is read in your browser. Nothing is sent anywhere until you paste the request into Claude.</span>
-            </div>
-            <input type="file" id="file" multiple accept=".pdf,.docx,.txt,.md" hidden>
-            <ul class="files" id="files"></ul>
-          </div>
-        </div>
-      </section>
-    </form>
-
-    <aside class="side">
-      <div class="panel">
-        <div class="preview-head">
-          <h2>Your request</h2>
-          <button type="button" class="btn" id="copy" disabled>Copy request</button>
-        </div>
-        <pre class="request" id="request" aria-live="polite"></pre>
-        <p class="status" id="status"></p>
-        <textarea class="fallback" id="fallback" hidden readonly aria-label="Request text to copy manually"></textarea>
-        <div style="display:grid;gap:8px">
-          <h3>Then</h3>
-          <ol class="steps">
-            <li>Open Claude (Cowork or Claude Code) in the folder where you keep your researcher files.</li>
-            <li>Paste the request and send it. Claude runs the whole pipeline without stopping, typically in 15–30 minutes.</li>
-            <li>Open the HTML briefing report when Claude says it is done.</li>
-          </ol>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>What you get</h3>
-        <ul class="outputs" id="outputs"></ul>
-      </div>
-    </aside>
+    <h1>Horizon Europe Consortium Finder</h1>
   </div>
-
-  <footer>
-    Needs the <b>research-funding</b> plugin installed in Claude. Installation guide: <a href="https://github.com/madsberggreen/Horizon-Europe-Consortium-Finder" target="_blank" rel="noopener">github.com/madsberggreen/Horizon-Europe-Consortium-Finder</a>. Pitch letters are drafts. Claude never sends anything on your behalf.
-  </footer>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
-<script>
-(function () {
-  var MAX_DOC_CHARS = 80000;
-  var state = { mode: "simple", docs: [] };
-  var $ = function (id) { return document.getElementById(id); };
-  var els = {
-    simple: $("mode-simple"), advanced: $("mode-advanced"),
-    noteS: $("note-simple"), noteA: $("note-advanced"), adv: $("advanced"), advBody: $("adv-body"),
-    name: $("name"), inst: $("institution"), orcid: $("orcid"), orcidHint: $("orcid-hint"),
-    consent: $("consent"), idea: $("idea"), drop: $("drop"), file: $("file"), files: $("files"),
-    request: $("request"), copy: $("copy"), status: $("status"), fallback: $("fallback"), outputs: $("outputs")
-  };
-
-  if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-  }
-
-  // ORCID iD checksum (ISO 7064 MOD 11-2)
-  function orcidValid(v) {
-    if (!/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(v)) return false;
-    var d = v.replace(/-/g, ""), total = 0;
-    for (var i = 0; i < 15; i++) total = (total + Number(d[i])) * 2;
-    var r = (12 - (total % 11)) % 11;
-    return d[15] === (r === 10 ? "X" : String(r));
-  }
-  function normOrcid(v) {
-    v = v.trim().replace(/^https?:\/\/(www\.)?orcid\.org\//i, "").toUpperCase();
-    var digits = v.replace(/[^0-9X]/g, "");
-    return digits.length === 16 ? digits.replace(/(.{4})(.{4})(.{4})(.{4})/, "$1-$2-$3-$4") : v;
-  }
-  function slug(s) {
-    return s.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9\u00e6\u00f8\u00e5]+/g, "-").replace(/^-|-$/g, "") || "name";
-  }
-  function today() { return new Date().toISOString().slice(0, 10); }
-  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-  function fmtChars(n) { return n.toLocaleString("en-GB") + " characters"; }
-
-  function setMode(mode) {
-    state.mode = mode;
-    var adv = mode === "advanced";
-    els.simple.setAttribute("aria-pressed", String(!adv));
-    els.advanced.setAttribute("aria-pressed", String(adv));
-    els.noteS.hidden = adv; els.noteA.hidden = !adv; els.adv.hidden = !adv;
-    try { localStorage.setItem("cf-mode", mode); } catch (e) {}
-    render();
-  }
-  function setConsent() {
-    var on = els.consent.checked;
-    els.advBody.classList.toggle("locked", !on);
-    els.advBody.setAttribute("aria-disabled", String(!on));
-    els.idea.disabled = !on;
-    els.drop.tabIndex = on ? 0 : -1;
-    render();
-  }
-
-  function orcidState() {
-    var raw = els.orcid.value.trim();
-    if (!raw) { els.orcidHint.textContent = "Helps Claude find the right person when names are common."; els.orcidHint.className = "hint"; return { ok: true, value: "" }; }
-    var v = normOrcid(raw);
-    if (orcidValid(v)) { els.orcidHint.textContent = "Valid ORCID iD."; els.orcidHint.className = "hint ok"; return { ok: true, value: v }; }
-    els.orcidHint.textContent = "This is not a valid ORCID iD. It has 16 characters in four groups, like 0000-0002-1825-0097. Leave it empty if unsure.";
-    els.orcidHint.className = "hint err";
-    return { ok: false, value: raw };
-  }
-
-  function build() {
-    var name = els.name.value.trim(), inst = els.inst.value.trim(), o = orcidState();
-    var adv = state.mode === "advanced";
-    var idea = els.idea.value.trim();
-    var readyDocs = state.docs.filter(function (d) { return d.text; });
-    var missing = [];
-    if (!name) missing.push("the researcher's name");
-    if (!inst) missing.push("the institution");
-    if (!o.ok) missing.push("a valid ORCID iD (or leave it empty)");
-    if (adv && !els.consent.checked) missing.push("confirmation that you checked the AI guidelines");
-    if (adv && els.consent.checked && !idea && !readyDocs.length) missing.push("a research idea or at least one document");
-    if (state.docs.some(function (d) { return d.loading; })) missing.push("documents to finish reading");
-
-    var full = ["/add-researcher", "Mode: " + (adv ? "Advanced" : "Simple"),
-      "Name: " + (name || "…"), "Institution: " + (inst || "…")];
-    if (o.value) full.push("ORCID: " + o.value);
-    var shown = full.map(esc);
-    if (adv && els.consent.checked) {
-      if (idea) {
-        full.push("Research idea:", "<<<", idea, ">>>");
-        shown.push("Research idea:", "&lt;&lt;&lt;", esc(idea), "&gt;&gt;&gt;");
-      }
-      readyDocs.forEach(function (d) {
-        full.push("Document: " + d.name, "<<<", d.text, ">>>");
-        shown.push("Document: " + esc(d.name), "&lt;&lt;&lt;", '<span class="dim">[' + fmtChars(d.text.length) + " of extracted text]</span>", "&gt;&gt;&gt;");
-      });
-    }
-    return { text: full.join("\n"), html: shown.join("\n"), missing: missing, name: name };
-  }
-
-  function renderOutputs(name) {
-    var n = name ? slug(name) : "name", base = "researchers/" + (name ? esc(name) : "&lt;Name&gt;") + "/", d = today();
-    var rows = [
-      ["HTML", "Briefing report with all results", base + "reports/" + n + "-briefing-" + d + ".html"],
-      ["PDF", "Matched open and forthcoming calls, scored 1–20", base + "calls/" + n + "-calls-" + d + ".pdf"],
-      ["PDF", "Proposal Intelligence: policy documents, COST Actions, brokerage events", base + "intelligence/" + n + "-intelligence-" + d + ".pdf"],
-      ["PDF", "CORDIS partner analysis: who wins in this area", base + "cordis/" + n + "-cordis-" + d + ".pdf"],
-      ["3 × MD", "Pitch letters to likely coordinators, as drafts", base + "pitches/"]
-    ];
-    els.outputs.innerHTML = rows.map(function (r) {
-      return '<li><span class="fmt">' + r[0] + '</span><span>' + r[1] + '<br><code>' + r[2] + '</code></span></li>';
-    }).join("");
-  }
-
-  function render() {
-    var b = build();
-    els.request.innerHTML = b.html;
-    els.copy.disabled = b.missing.length > 0;
-    if (b.missing.length) {
-      els.status.textContent = "Still needed: " + b.missing.join(", ") + ".";
-      els.status.className = "status";
-    } else if (!/^Copied/.test(els.status.textContent)) {
-      els.status.textContent = "Ready to copy.";
-      els.status.className = "status ok";
-    }
-    els.fallback.hidden = true;
-    renderOutputs(b.name);
-  }
-
-  // --- Documents ---
-  function readPdf(buf) {
-    return pdfjsLib.getDocument({ data: buf }).promise.then(function (pdf) {
-      var pages = [];
-      for (var i = 1; i <= pdf.numPages; i++) pages.push(pdf.getPage(i).then(function (p) { return p.getTextContent(); })
-        .then(function (c) { return c.items.map(function (it) { return it.str + (it.hasEOL ? "\n" : " "); }).join(""); }));
-      return Promise.all(pages).then(function (t) { return t.join("\n\n"); });
-    });
-  }
-  function readFile(file) {
-    var ext = (file.name.split(".").pop() || "").toLowerCase();
-    if (ext === "txt" || ext === "md") return file.text();
-    if (ext === "pdf") {
-      if (!window.pdfjsLib) return Promise.reject(new Error("The PDF reader did not load. Check your internet connection and reload the page."));
-      return file.arrayBuffer().then(readPdf);
-    }
-    if (ext === "docx") {
-      if (!window.mammoth) return Promise.reject(new Error("The Word reader did not load. Check your internet connection and reload the page."));
-      return file.arrayBuffer().then(function (buf) { return mammoth.extractRawText({ arrayBuffer: buf }); }).then(function (r) { return r.value; });
-    }
-    return Promise.reject(new Error("This file type is not supported. Use PDF, .docx, .txt or .md (save .doc files as .docx first)."));
-  }
-  function addFiles(list) {
-    if (!els.consent.checked) return;
-    Array.prototype.forEach.call(list, function (file) {
-      if (state.docs.some(function (d) { return d.name === file.name; })) return;
-      var doc = { name: file.name, loading: true, text: "", note: "Reading…", error: false };
-      state.docs.push(doc); renderFiles(); render();
-      readFile(file).then(function (text) {
-        text = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
-        if (!text) { doc.error = true; doc.note = "No text found. Scanned PDFs have no readable text; use the original document instead."; }
-        else if (text.length > MAX_DOC_CHARS) { doc.text = text.slice(0, MAX_DOC_CHARS); doc.note = fmtChars(MAX_DOC_CHARS) + " used (the document was longer and has been cut)"; }
-        else { doc.text = text; doc.note = fmtChars(text.length) + " read"; }
-      }).catch(function (e) { doc.error = true; doc.note = e.message || "Could not read this file."; })
-        .then(function () { doc.loading = false; renderFiles(); render(); });
-    });
-  }
-  function renderFiles() {
-    els.files.innerHTML = "";
-    state.docs.forEach(function (d, i) {
-      var li = document.createElement("li");
-      li.innerHTML = '<div><div class="name"></div><div class="meta' + (d.error ? " err" : "") + '"></div></div><button type="button" class="x">Remove</button>';
-      li.querySelector(".name").textContent = d.name;
-      li.querySelector(".meta").textContent = d.note;
-      li.querySelector(".x").setAttribute("aria-label", "Remove " + d.name);
-      li.querySelector(".x").addEventListener("click", function () { state.docs.splice(i, 1); renderFiles(); render(); });
-      els.files.appendChild(li);
-    });
-  }
-
-  // --- Copy ---
-  els.copy.addEventListener("click", function () {
-    var text = build().text;
-    function fallback() {
-      els.fallback.value = text; els.fallback.hidden = false; els.fallback.focus(); els.fallback.select();
-      els.status.textContent = "Your browser blocked automatic copying. The text below is selected: press Ctrl+C (Cmd+C on Mac).";
-      els.status.className = "status err";
-    }
-    try {
-      navigator.clipboard.writeText(text).then(function () {
-        els.status.textContent = "Copied. Paste it into Claude and send it.";
-        els.status.className = "status ok";
-      }, fallback);
-    } catch (e) { fallback(); }
-  });
-
-  // --- Events ---
-  els.simple.addEventListener("click", function () { setMode("simple"); });
-  els.advanced.addEventListener("click", function () { setMode("advanced"); });
-  [els.name, els.inst, els.orcid, els.idea].forEach(function (el) {
-    el.addEventListener("input", function () { els.status.textContent = ""; render(); });
-  });
-  els.consent.addEventListener("change", setConsent);
-  els.drop.addEventListener("click", function () { if (els.consent.checked) els.file.click(); });
-  els.drop.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && els.consent.checked) { e.preventDefault(); els.file.click(); } });
-  els.file.addEventListener("change", function () { addFiles(els.file.files); els.file.value = ""; });
-  ["dragenter", "dragover"].forEach(function (t) { els.drop.addEventListener(t, function (e) { e.preventDefault(); if (els.consent.checked) els.drop.classList.add("over"); }); });
-  ["dragleave", "drop"].forEach(function (t) { els.drop.addEventListener(t, function (e) { e.preventDefault(); els.drop.classList.remove("over"); }); });
-  els.drop.addEventListener("drop", function (e) { if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files); });
-  document.getElementById("form").addEventListener("submit", function (e) { e.preventDefault(); });
-  // Stop files dropped next to the zone from opening in the browser tab
-  window.addEventListener("dragover", function (e) { e.preventDefault(); });
-  window.addEventListener("drop", function (e) { e.preventDefault(); });
-
-  var saved = null;
-  try { saved = localStorage.getItem("cf-mode"); } catch (e) {}
-  setMode(saved === "advanced" ? "advanced" : "simple");
-  setConsent();
-})();
-</script>
+  <div class="card">
+    <h2>Start in Claude</h2>
+    <p>The form now opens inside Claude. Type this in a new chat:</p>
+    <span class="cmd">/start</span>
+    <p class="muted">Fill in the form, choose simple or advanced search and press <b>Find me a consortium!</b>. Claude then generates the reports.</p>
+  </div>
+  <div class="card">
+    <h2>Not installed yet?</h2>
+    <ol>
+      <li>In Claude, open <b>Customize</b> → <b>Plugins</b>.</li>
+      <li>Click <b>Add</b> → <b>Add marketplace</b> → <b>Add from a repository</b> and enter <code>madsberggreen/Horizon-Europe-Consortium-Finder</code>.</li>
+      <li>Open <b>Discover</b>, search for <code>research-funding</code> and click <b>Install</b>.</li>
+    </ol>
+    <p class="muted">Full guide: <a href="https://github.com/madsberggreen/Horizon-Europe-Consortium-Finder" target="_blank" rel="noopener">github.com/madsberggreen/Horizon-Europe-Consortium-Finder</a></p>
+  </div>
+</main>

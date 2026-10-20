@@ -1,20 +1,149 @@
 ---
-description: Open the start form — find Horizon Europe calls, partners and pitch letters for a researcher with one click
+description: Open the Consortium Finder form — fill in a researcher, choose simple or advanced search, and press "Find me a consortium!" to generate the reports
 ---
 
 # /start
 
-Shows the start form inside the chat. The user fills it in and presses **Find me a consortium!**; the form then sends the request as the user's next message and the pipeline runs.
+Shows the Consortium Finder form inside the chat. The user fills it in and presses **Find me a consortium!**; the form then sends the request as the user's next message and the pipeline runs.
 
-## Show the form
+## Show the form — do this immediately
 
-1. If you have the `show_widget` tool (Imagine / visualize), call its `read_me` first if this conversation hasn't yet (modules: `interactive`), then call `show_widget` with:
+The complete form is embedded at the bottom of this file. **Do not search for any file, and do not run any command to find one.**
+
+1. Write one line: "Fill in the form and press **Find me a consortium!** Simple search uses only publicly available data."
+2. Call the `show_widget` tool (Imagine / visualize; if its `read_me` hasn't been called in this conversation, call it first with modules `["interactive"]`) with:
    - `title`: `consortium_finder_form`
    - `loading_messages`: `["Laying out the form"]`
-   - `widget_code`: the full contents of `${CLAUDE_PLUGIN_ROOT}/start/form.html`, **verbatim** — read the file and pass it unchanged. Never rewrite, shorten or restyle it.
-   Before the call, write one line: "Fill in the form and press **Find me a consortium!** Simple search uses only publicly available data." Write nothing after the call.
-2. If you don't have `show_widget`, ask in plain text for name, institution, optional ORCID iD, and whether they want a simple search (public data only) or an advanced search (their own idea and documents). For advanced search, first show this warning and wait for a yes: "Check your institutional guidelines on AI use before uploading any data. Only upload data that you or your institution has full ownership of." Then ask for the idea and invite them to attach documents in the chat. Also mention the start page https://claude.ai/artifact/R1rkx8dabe6gKRKpYNZ43E as an alternative.
+   - `widget_code`: everything between the lines `<!-- FORM START -->` and `<!-- FORM END -->` below, copied **verbatim**. Never rewrite, shorten, translate or restyle it.
+3. Write nothing after the call. Wait for the user's next message.
+
+Do **not** create an artifact or a file for the form: only the inline widget can send the request back to the chat.
+
+If — and only if — there is no `show_widget` tool, ask in plain text for name, institution, optional ORCID iD, and simple search (public data only) or advanced search (their own idea and documents). Before advanced search, show this warning and wait for a yes: "Check your institutional guidelines on AI use before uploading any data. Only upload data that you or your institution has full ownership of." Then ask for the idea and invite them to attach documents in the chat. Do not offer any link.
 
 ## When the request arrives
 
-The form's message starts with `Find me a consortium!` followed by `Mode:`, `Name:`, `Institution:`, optional `ORCID:`, and in Advanced mode `Research idea:` / `Document:` blocks between `<<<` and `>>>`. Treat it exactly as an `/add-researcher` request in that format and run the full pipeline in `${CLAUDE_PLUGIN_ROOT}/commands/add-researcher.md` (read it if it isn't in context), starting at step 0. Do not ask for confirmation first. Documents the user attached in the chat instead (plain-text fallback) count as `Document:` blocks.
+The form's message starts with `Find me a consortium!` followed by `Mode:`, `Name:`, `Institution:`, optional `ORCID:`, and in Advanced mode `Research idea:` / `Document:` blocks between `<<<` and `>>>`. Treat it as an `/add-researcher` request in that format and run the full `add-researcher` pipeline of this plugin (the `add-researcher` command or skill), starting at step 0, without asking for confirmation. Documents the user attached in the chat instead (plain-text fallback) count as `Document:` blocks.
+
+Where there is no persistent workspace folder (for example a regular chat), work in the current working directory and give the user the HTML report and PDFs as downloadable files at the end.
+
+## Form
+
+<!-- FORM START -->
+<h2 class="sr-only">Form to start a Horizon Europe consortium search for a researcher, in simple or advanced mode.</h2>
+<style>
+.cf{display:grid;gap:1.25rem;padding:1rem 0}
+.cf-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--surface-1)}
+.cf-switch button{border:0;background:transparent;color:var(--text-secondary)}
+.cf-switch button[aria-pressed="true"]{background:var(--surface-2);color:var(--text-primary);box-shadow:0 0 0 0.5px var(--border-strong)}
+.cf-f{display:grid;gap:6px}
+.cf-f label,.cf-lbl{font-size:14px;font-weight:500}
+.cf-hint{font-size:13px;color:var(--text-secondary);margin:0}
+.cf-err{font-size:13px;color:var(--text-danger);margin:0}
+.cf-file{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:0.5px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:13px}
+</style>
+<div class="cf">
+  <div class="cf-switch" role="group" aria-label="Search type">
+    <button type="button" id="cf-simple" aria-pressed="true">Simple search</button>
+    <button type="button" id="cf-adv" aria-pressed="false">Advanced search</button>
+  </div>
+  <p id="cf-note-s" style="margin:0;font-size:14px;color:var(--text-secondary);display:flex;gap:8px;align-items:flex-start"><i class="ti ti-world" style="font-size:18px;color:var(--text-accent)" aria-hidden="true"></i><span>Uses only publicly available data: ORCID, institutional pages, CORDIS and the EU Funding and Tenders Portal.</span></p>
+  <p id="cf-note-a" hidden style="margin:0;font-size:14px;color:var(--text-secondary);display:flex;gap:8px;align-items:flex-start"><i class="ti ti-bulb" style="font-size:18px;color:var(--text-accent)" aria-hidden="true"></i><span>Adds your own idea and documents. They steer the profile, the policy briefing and the pitch letters, so results can point beyond your usual field.</span></p>
+
+  <div class="cf-f">
+    <label for="cf-name">Who is the researcher?</label>
+    <input type="text" id="cf-name" placeholder="Anne Jensen" style="width:100%">
+    <p class="cf-err" id="cf-name-err" hidden>Enter the researcher's name.</p>
+  </div>
+  <div class="cf-f">
+    <label for="cf-inst">Which institution?</label>
+    <input type="text" id="cf-inst" placeholder="Name of your research institution" style="width:100%">
+    <p class="cf-err" id="cf-inst-err" hidden>Enter the institution.</p>
+  </div>
+  <div class="cf-f">
+    <label for="cf-orcid">ORCID iD <span style="font-weight:400;color:var(--text-secondary)">(optional)</span></label>
+    <input type="text" id="cf-orcid" placeholder="0000-0002-1825-0097" style="width:100%">
+    <p class="cf-hint" id="cf-orcid-hint">Helps find the right person when names are common.</p>
+  </div>
+
+  <div id="cf-advanced" hidden style="display:grid;gap:1.25rem;border-top:0.5px solid var(--border);padding-top:1.25rem">
+    <div style="background:var(--bg-warning);color:var(--text-warning);border:0.5px solid var(--border-warning);border-radius:var(--radius);padding:12px 14px;display:grid;gap:10px;font-size:14px">
+      <p style="margin:0"><i class="ti ti-alert-triangle" style="font-size:16px;vertical-align:-2px;margin-right:6px" aria-hidden="true"></i>Check your institutional guidelines on AI use before uploading any data. Only upload data that you or your institution has full ownership of.</p>
+      <label for="cf-consent" style="display:flex;gap:8px;align-items:flex-start;font-weight:500;cursor:pointer"><input type="checkbox" id="cf-consent" style="margin-top:4px">I've checked the guidelines, and I or my institution own the material I add.</label>
+    </div>
+    <p class="cf-err" id="cf-consent-err" hidden>Confirm that you've checked the guidelines before adding material.</p>
+    <div class="cf-f">
+      <label for="cf-idea">What do you want to work on?</label>
+      <textarea id="cf-idea" rows="5" style="width:100%" placeholder="The problem, the methods, the setting. It's fine if it differs from your previous research."></textarea>
+    </div>
+    <div class="cf-f">
+      <span class="cf-lbl">Documents <span style="font-weight:400;color:var(--text-secondary)">(optional: rejected applications, one-pagers, concept notes)</span></span>
+      <div id="cf-drop" tabindex="0" role="button" aria-label="Add documents" style="border:1px dashed var(--border-strong);border-radius:var(--radius);padding:18px 12px;text-align:center;cursor:pointer;color:var(--text-secondary);font-size:14px">
+        <i class="ti ti-upload" style="font-size:20px" aria-hidden="true"></i><br>Drop PDF, Word (.docx), .txt or .md files here, or click to choose
+      </div>
+      <input type="file" id="cf-file" multiple accept=".pdf,.docx,.txt,.md" hidden>
+      <div id="cf-files" style="display:grid;gap:6px"></div>
+    </div>
+    <p class="cf-err" id="cf-adv-err" hidden>Describe your idea or add at least one document, or switch to simple search.</p>
+  </div>
+
+  <div style="display:grid;gap:8px">
+    <button type="button" id="cf-go" style="background:var(--fill-accent);color:var(--on-accent);border:0;height:44px;font-weight:500;font-size:16px">Find me a consortium! ↗</button>
+    <p class="cf-hint" id="cf-status">Claude runs the whole pipeline in this chat, typically in 15–30 minutes. Pitch letters are drafts; nothing is sent on your behalf.</p>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+<script>
+(function(){
+var MAX=30000,mode="simple",docs=[],sent=false;
+var $=function(i){return document.getElementById(i)};
+if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"}
+function orcidOk(v){if(!/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(v))return false;var d=v.replace(/-/g,""),t=0;for(var i=0;i<15;i++)t=(t+Number(d[i]))*2;var r=(12-t%11)%11;return d[15]===(r===10?"X":String(r))}
+function normOrcid(v){v=v.trim().replace(/^https?:\/\/(www\.)?orcid\.org\//i,"").toUpperCase();var d=v.replace(/[^0-9X]/g,"");return d.length===16?d.replace(/(.{4})(.{4})(.{4})(.{4})/,"$1-$2-$3-$4"):v}
+function setMode(m){mode=m;var a=m==="advanced";$("cf-simple").setAttribute("aria-pressed",String(!a));$("cf-adv").setAttribute("aria-pressed",String(a));$("cf-note-s").hidden=a;$("cf-note-a").hidden=!a;$("cf-advanced").hidden=!a;if(a){$("cf-note-a").style.display="flex";$("cf-advanced").style.display="grid"}else{$("cf-note-a").style.display="none";$("cf-advanced").style.display="none"}$("cf-note-s").style.display=a?"none":"flex"}
+function show(id,on){var e=$(id);e.hidden=!on;e.style.display=on?"block":"none"}
+function chars(n){return Math.round(n).toLocaleString("en-GB")+" characters"}
+function readPdf(buf){return pdfjsLib.getDocument({data:buf}).promise.then(function(pdf){var p=[];for(var i=1;i<=pdf.numPages;i++)p.push(pdf.getPage(i).then(function(pg){return pg.getTextContent()}).then(function(c){return c.items.map(function(it){return it.str+(it.hasEOL?"\n":" ")}).join("")}));return Promise.all(p).then(function(t){return t.join("\n\n")})})}
+function read(f){var x=(f.name.split(".").pop()||"").toLowerCase();if(x==="txt"||x==="md")return f.text();if(x==="pdf"){if(!window.pdfjsLib)return Promise.reject(new Error("The PDF reader didn't load. Check your connection and run /start again."));return f.arrayBuffer().then(readPdf)}if(x==="docx"){if(!window.mammoth)return Promise.reject(new Error("The Word reader didn't load. Check your connection and run /start again."));return f.arrayBuffer().then(function(b){return mammoth.extractRawText({arrayBuffer:b})}).then(function(r){return r.value})}return Promise.reject(new Error("Use PDF, .docx, .txt or .md. Save .doc files as .docx first."))}
+function renderFiles(){var box=$("cf-files");box.innerHTML="";docs.forEach(function(d,i){var row=document.createElement("div");row.className="cf-file";row.innerHTML='<div><div style="font-weight:500;overflow-wrap:anywhere"></div><div></div></div><button type="button">Remove</button>';row.children[0].children[0].textContent=d.name;var m=row.children[0].children[1];m.textContent=d.note;m.style.color=d.error?"var(--text-danger)":"var(--text-secondary)";row.children[1].setAttribute("aria-label","Remove "+d.name);row.children[1].addEventListener("click",function(){docs.splice(i,1);renderFiles()});box.appendChild(row)})}
+function add(list){if(!$("cf-consent").checked){show("cf-consent-err",true);return}Array.prototype.forEach.call(list,function(f){if(docs.some(function(d){return d.name===f.name}))return;var d={name:f.name,loading:true,text:"",note:"Reading…",error:false};docs.push(d);renderFiles();read(f).then(function(t){t=t.replace(/\r\n/g,"\n").replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim();if(!t){d.error=true;d.note="No text found. Scanned PDFs have no readable text; use the original document."}else if(t.length>MAX){d.text=t.slice(0,MAX);d.note=chars(MAX)+" used (the document was longer and has been cut)"}else{d.text=t;d.note=chars(t.length)+" read"}}).catch(function(e){d.error=true;d.note=e.message||"Couldn't read this file."}).then(function(){d.loading=false;renderFiles()})})}
+$("cf-simple").addEventListener("click",function(){setMode("simple")});
+$("cf-adv").addEventListener("click",function(){setMode("advanced")});
+$("cf-name").addEventListener("input",function(){show("cf-name-err",false)});
+$("cf-inst").addEventListener("input",function(){show("cf-inst-err",false)});
+$("cf-idea").addEventListener("input",function(){show("cf-adv-err",false)});
+$("cf-consent").addEventListener("change",function(){show("cf-consent-err",false)});
+$("cf-orcid").addEventListener("input",function(){var h=$("cf-orcid-hint"),v=$("cf-orcid").value.trim();if(!v){h.textContent="Helps find the right person when names are common.";h.style.color="var(--text-secondary)";return}if(orcidOk(normOrcid(v))){h.textContent="Valid ORCID iD.";h.style.color="var(--text-success)"}else{h.textContent="Not a valid ORCID iD. It has 16 characters in four groups, like 0000-0002-1825-0097. Leave it empty if unsure.";h.style.color="var(--text-danger)"}});
+var drop=$("cf-drop"),fi=$("cf-file");
+drop.addEventListener("click",function(){if(!$("cf-consent").checked){show("cf-consent-err",true);return}fi.click()});
+drop.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();drop.click()}});
+fi.addEventListener("change",function(){add(fi.files);fi.value=""});
+["dragenter","dragover"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.style.borderColor="var(--border-accent)";drop.style.background="var(--bg-accent)"})});
+["dragleave","drop"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.style.borderColor="";drop.style.background=""})});
+drop.addEventListener("drop",function(e){if(e.dataTransfer&&e.dataTransfer.files)add(e.dataTransfer.files)});
+window.addEventListener("dragover",function(e){e.preventDefault()});window.addEventListener("drop",function(e){e.preventDefault()});
+$("cf-go").addEventListener("click",function(){
+if(sent)return;
+var name=$("cf-name").value.trim(),inst=$("cf-inst").value.trim(),o=$("cf-orcid").value.trim(),ok=true;
+if(!name){show("cf-name-err",true);ok=false}
+if(!inst){show("cf-inst-err",true);ok=false}
+if(o){o=normOrcid(o);if(!orcidOk(o)){$("cf-orcid-hint").style.color="var(--text-danger)";ok=false}}
+var adv=mode==="advanced",idea=$("cf-idea").value.trim(),ready=docs.filter(function(d){return d.text});
+if(adv&&!$("cf-consent").checked){show("cf-consent-err",true);ok=false}
+if(adv&&$("cf-consent").checked&&!idea&&!ready.length){show("cf-adv-err",true);ok=false}
+if(docs.some(function(d){return d.loading})){$("cf-status").textContent="Wait until the documents have been read.";ok=false}
+if(!ok)return;
+var L=["Find me a consortium!","Mode: "+(adv?"Advanced":"Simple"),"Name: "+name,"Institution: "+inst];
+if(o)L.push("ORCID: "+o);
+if(adv){if(idea)L.push("Research idea:","<<<",idea,">>>");ready.forEach(function(d){L.push("Document: "+d.name,"<<<",d.text,">>>")})}
+var msg=L.join("\n");
+if(typeof sendPrompt==="function"){sent=true;$("cf-go").textContent="Started — follow the progress in the chat";$("cf-go").style.opacity="0.6";sendPrompt(msg);return}
+var st=$("cf-status");
+try{navigator.clipboard.writeText(msg).then(function(){st.textContent="This view can't send to the chat. Your request is copied: paste it into the chat and send it.";st.style.color="var(--text-warning)"},function(){st.textContent="This view can't send to the chat. Type /start in the chat itself to use the form there.";st.style.color="var(--text-danger)"})}catch(e){st.textContent="This view can't send to the chat. Type /start in the chat itself to use the form there.";st.style.color="var(--text-danger)"}
+});
+setMode("simple");
+})();
+</script>
+<!-- FORM END -->

@@ -1,6 +1,12 @@
-# research-funding v2.4.1
+# research-funding v2.5.0
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.5.0
+
+- **`/start` works in regular chats.** The form is embedded in `commands/start.md` itself; in a chat Claude can only read the command's own text, so the separate `start/form.html` was never found. The fallback no longer links to the old copy-and-paste page, and Claude is told not to render the form as an artifact (only the inline widget can send the request).
+- The profile template moved to `skills/researcher-profiling/templates/profil.md` for the same reason.
+- If the form is shown somewhere it can't send to the chat, the button copies the request instead and says so.
 
 ## What changed in v2.4.1
 

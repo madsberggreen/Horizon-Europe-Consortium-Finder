@@ -34,9 +34,9 @@ If your organization restricts which marketplaces you may add, ask your Claude a
 
 ## Use
 
-**Easiest: type `/start` in Claude.** A form appears in the chat. Choose simple or advanced search, fill it in and press **Find me a consortium!**. The pipeline starts straight away.
+**Type `/start` in Claude.** A form appears in the chat. Choose **Simple search** (name, institution, optional ORCID iD; public data only) or **Advanced search** (adds your research idea and documents such as rejected applications or one-pagers), fill it in and press **Find me a consortium!**. Claude then generates the reports. In Advanced mode your input shapes the profile, the call matching, the policy briefing and the pitch letters. Documents are read in your browser and only reach Claude when you press the button.
 
-**Alternative: the start page.** Open https://claude.ai/artifact/R1rkx8dabe6gKRKpYNZ43E, choose **Simple search** (name, institution, optional ORCID; public data only) or **Advanced search** (adds your research idea and documents such as rejected applications or one-pagers), click **Copy request** and paste it into Claude. In Advanced mode your input shapes the profile, the call matching, the policy briefing and the pitch letters. Documents are read in your browser and only reach Claude when you paste the request. The page's source is `app/index.html`.
+In a regular chat, Claude gives you the reports as downloadable files at the end. In Cowork or Claude Code they are saved in your workspace folder.
 
 You can also type commands directly in a workspace folder, for example:
 

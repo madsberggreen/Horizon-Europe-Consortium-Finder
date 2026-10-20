@@ -8,7 +8,7 @@ Triggered by a researcher name (optionally + institution): "Tilføj Anne Mette F
 
 ## Modes
 
-Requests built with the start page (`app/index.html` in the repository) look like this:
+Requests from the `/start` form look like this:
 
 ```
 /add-researcher
@@ -35,7 +35,7 @@ extracted text
 
 **0. CORDIS data check** — before anything else, run `python "${CLAUDE_PLUGIN_ROOT}/skills/cordis-analysis/scripts/download_cordis.py" --data-dir "<workspace>/cordis-data"` (the script sits in the `cordis-analysis` skill's `scripts/` folder). It downloads the official CORDIS extracts on first use and refreshes them when older than 30 days; otherwise it does nothing. Never ask the user to update CORDIS files by hand. If it exits 1, continue — step 5 falls back to web search.
 
-**1. Folders** — create `researchers/[Name]/{inbox,profile,calls,cordis,intelligence,pitches,reports}/`; copy `researchers/_template/profil.md` in and set the name. If the workspace has no `researchers/_template/profil.md`, create it first from the plugin's `templates/profil.md`. **Advanced mode:** save the research idea and every document block verbatim to `inbox/user-input-[YYYY-MM-DD].md` (header `# User input — [Name]` / `_Mode: Advanced | Received: [date]_`, then `## Research idea` and one `## Document: [file name]` section per document).
+**1. Folders** — create `researchers/[Name]/{inbox,profile,calls,cordis,intelligence,pitches,reports}/`; copy `researchers/_template/profil.md` in and set the name. If the workspace has no `researchers/_template/profil.md`, create it first from `templates/profil.md` in the `researcher-profiling` skill's folder. **Advanced mode:** save the research idea and every document block verbatim to `inbox/user-input-[YYYY-MM-DD].md` (header `# User input — [Name]` / `_Mode: Advanced | Received: [date]_`, then `## Research idea` and one `## Document: [file name]` section per document).
 
 **2. Profile** — run `researcher-profiling` in the request's mode (institution from the message, else ask; use the ORCID from the request when given). Mark auto-fetched data `_(auto-hentet [date])_`. Save `profile/[name]-profile.md` and fill `profil.md`.
 
