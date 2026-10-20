@@ -1,6 +1,10 @@
-# research-funding v2.3.0
+# research-funding v2.4.0
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.4.0
+
+- **`/start` command.** Shows the start form (`start/form.html`) inside the chat via the visualize widget. Pressing **Find me a consortium!** sends the request as the user's next message and the pipeline runs — no copy and paste. Falls back to plain-text questions where the chat cannot show widgets.
 
 ## What changed in v2.3.0
 
