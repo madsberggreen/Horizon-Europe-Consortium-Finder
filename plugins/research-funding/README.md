@@ -1,6 +1,12 @@
-# research-funding v2.6.0
+# research-funding v2.6.1
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.6.1
+
+- **Call matching found almost nothing.** `fetch_calls.py` now sends the portal's own search filter (calls for proposals, open or forthcoming, Horizon Europe). Before, the search returned organisations, news and closed calls, and typically only 2 outdated calls survived; a test sweep now returns about 100 live topics.
+- Calls are keyed by their **topic** identifier (before: the parent call, which merged topics and broke topic links), titles come from the right field, and topics whose every deadline has passed are dropped even when the portal still marks them forthcoming.
+- **CORDIS analysis crashed** on publications without authors (`TypeError: 'float' object is not subscriptable`). Empty cells are now handled, and organisations without a website no longer produce `NaN` in the output.
 
 ## What changed in v2.6.0
 

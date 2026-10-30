@@ -85,6 +85,7 @@ def main():
     g["score"] = (g["projects_in_topic"] * 2 + g["coordinator_in_topic"] * 3
                   + g["ec_in_topic"] / 1_000_000)
     top = g.sort_values("score", ascending=False).head(args.top_orgs)
+    top = top.fillna({"country": "", "activity": "", "org_url": "", "org_id": ""})
 
     # --- Geographic gap ---
     n_proj = len(sel_ids)
@@ -119,7 +120,7 @@ def main():
     warm = []
     try:
         pub = read(args.data_dir, "projectPublications.csv")
-        pubs = pub[pub["projectID"].isin(sel_ids)]
+        pubs = pub[pub["projectID"].isin(sel_ids)].fillna("")  # empty cells are NaN, which `or ""` doesn't catch
         for _, r in pubs.head(200).iterrows():
             warm.append({"authors": (r.get("authors") or "")[:200],
                          "project": r.get("projectAcronym"), "projectID": r.get("projectID"),
@@ -147,7 +148,7 @@ def main():
              "start": r["startDate"], "end": r["endDate"],
              "url": f"https://cordis.europa.eu/project/id/{r['id']}"}
             for _, r in sel.sort_values("ecMaxContribution", key=lambda s: pd.to_numeric(s, errors="coerce"),
-                                        ascending=False).head(15).iterrows()],
+                                        ascending=False).head(15).fillna("").iterrows()],
         "geography": {"top_countries_pct": country_pct.head(10).to_dict(),
                       "home_country": home, "home_country_pct": home_pct,
                       "home_underrepresented": home_pct < 10.0},

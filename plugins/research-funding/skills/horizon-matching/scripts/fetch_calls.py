@@ -9,6 +9,7 @@ stored in the JSON only, so the chat context is not flooded. Read summaries
 selectively for the calls you shortlist.
 """
 import argparse
+import datetime as dt
 import json
 import sys
 import time
@@ -16,47 +17,72 @@ import time
 import requests
 
 API_URL = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
-HEADERS = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
 # OPEN=31094502, FORTHCOMING=31094501, CLOSED=31094503 (never include)
 ALLOWED = {"31094502": "OPEN", "31094501": "FORTHCOMING"}
+HORIZON_EUROPE = "43108390"  # frameworkProgramme id of Horizon Europe
+# The same filter the Funding & Tenders portal sends. Without it the search returns
+# organisations, news and closed calls, and the open topics drown in them.
+QUERY = {"bool": {"must": [
+    {"terms": {"type": ["1"]}},                     # calls for proposals (topics)
+    {"terms": {"status": list(ALLOWED)}},           # open + forthcoming only
+    {"term": {"programmePeriod": "2021 - 2027"}},
+    {"terms": {"frameworkProgramme": [HORIZON_EUROPE]}},
+]}}
+
+
+def first(m, *keys):
+    for k in keys:
+        v = m.get(k)
+        if v:
+            return v[0] if isinstance(v, list) else v
+    return ""
+
+
+def search(keyword, page):
+    files = {"query": ("blob", json.dumps(QUERY), "application/json"),
+             "languages": ("blob", json.dumps(["en"]), "application/json")}
+    params = {"apiKey": "SEDIA", "text": keyword, "pageSize": 50, "pageNumber": page}
+    resp = requests.post(API_URL, params=params, files=files, timeout=30)
+    resp.raise_for_status()
+    return resp.json().get("results", [])
 
 
 def fetch(keywords):
-    all_calls = {}  # keyed by identifier — deduplication built in
+    today = dt.date.today().isoformat()
+    all_calls = {}  # keyed by topic identifier — deduplication built in
     for keyword in keywords:
         for page in (1, 2):  # 2 pages = up to 100 results per keyword
-            encoded = requests.utils.quote(keyword)
-            data = (f"apiKey=SEDIA&text={encoded}&pageSize=50&pageNumber={page}"
-                    f"&sortBy=relevance&programmePeriod=2021+-+2027")
             try:
-                resp = requests.post(API_URL, headers=HEADERS, data=data, timeout=30)
-                results = resp.json().get("results", [])
+                results = search(keyword, page)
             except Exception as e:
                 print(f"ERROR '{keyword}' p{page}: {e}", file=sys.stderr)
                 continue
             for item in results:
                 m = item.get("metadata", {})
-                raw_status = (m.get("status") or m.get("sortStatus") or [""])[0]
+                raw_status = first(m, "status", "sortStatus")
                 if raw_status not in ALLOWED:
                     continue  # discard CLOSED and everything else
-                prog = (m.get("programmePeriod") or [""])[0]
-                if "2021" not in prog:
+                if first(m, "frameworkProgramme") != HORIZON_EUROPE:
                     continue  # discard non-Horizon Europe
-                ident = (m.get("callIdentifier") or m.get("topicIdentifier") or [""])[0]
+                ident = first(m, "identifier")  # the topic, not the call it belongs to
                 if not ident or ident in all_calls:
                     continue
+                # Multi-stage topics list several deadlines; the last one decides whether it is still live.
+                deadlines = sorted(d[:10] for d in (m.get("deadlineDate") or []) if d)
+                if deadlines and deadlines[-1] < today:
+                    continue  # portal still says OPEN/FORTHCOMING, but every deadline has passed
                 # Always build the topic URL deterministically — never trust the API's URL field.
                 topic_url = ("https://ec.europa.eu/info/funding-tenders/opportunities/portal/"
                              f"screen/opportunities/topic-details/{ident}")
                 all_calls[ident] = {
                     "identifier": ident,
-                    "title": item.get("title") or (m.get("topicTitle") or [""])[0]
-                             or (m.get("callTitle") or [""])[0] or "",
+                    "call_identifier": first(m, "callIdentifier"),
+                    "title": first(m, "title") or item.get("title") or item.get("summary") or "",
                     "status_label": ALLOWED[raw_status],
-                    "deadline": (m.get("deadlineDate") or [""])[0][:10],
-                    "opening_date": (m.get("startDate") or m.get("openingDate") or [""])[0][:10],
-                    "budget_raw": str((m.get("budget") or m.get("budgetOverview") or [""])[0]),
-                    "type": (m.get("typeOfAction") or [""])[0],
+                    "deadline": next((d for d in deadlines if d >= today), deadlines[-1] if deadlines else ""),
+                    "opening_date": first(m, "startDate", "openingDate")[:10],
+                    "budget_raw": str(first(m, "budgetOverview", "budget")),
+                    "type": first(m, "typesOfAction", "typeOfAction"),
                     "url": topic_url,
                     "summary": (item.get("summary") or item.get("content") or "")[:500],
                     "matched_keyword": keyword,
