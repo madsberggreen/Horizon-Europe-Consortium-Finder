@@ -1,22 +1,37 @@
 #!/usr/bin/env python3
-"""Fetch live OPEN/FORTHCOMING Horizon Europe calls from the EU Funding & Tenders API.
+"""Fetch OPEN/FORTHCOMING Horizon Europe calls from the EU Funding & Tenders API.
 
 Usage:
     python fetch_calls.py --out calls_verified.json "keyword one" "keyword two" ...
+    python fetch_calls.py --details TOPIC-ID [TOPIC-ID ...]    # full topic text incl. Expected Outcome
 
 Prints a compact table (identifier | status | deadline | title) — summaries are
 stored in the JSON only, so the chat context is not flooded. Read summaries
 selectively for the calls you shortlist.
+
+If the EU servers are blocked (Claude's sandbox often only allows GitHub and package
+registries), both modes fall back to the repository's weekly GitHub mirror of all open
+and forthcoming topics, with the same fields and the full topic descriptions.
 """
 import argparse
 import datetime as dt
+import gzip
+import html
 import json
+import os
+import re
 import sys
 import time
+import urllib.request
 
 import requests
 
 API_URL = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
+TOPIC_URL = "https://ec.europa.eu/info/funding-tenders/opportunities/data/topicDetails/{}.json"
+MIRROR_BASE = os.environ.get(  # override only for testing
+    "RF_MIRROR_BASE", "https://raw.githubusercontent.com/madsberggreen/Horizon-Europe-Consortium-Finder/data/")
+MIRROR_URL = MIRROR_BASE + "calls/open-calls.json.gz"
+MIRROR_MANIFEST = MIRROR_BASE + "manifest.json"
 # OPEN=31094502, FORTHCOMING=31094501, CLOSED=31094503 (never include)
 ALLOWED = {"31094502": "OPEN", "31094501": "FORTHCOMING"}
 HORIZON_EUROPE = "43108390"  # frameworkProgramme id of Horizon Europe
@@ -48,14 +63,19 @@ def search(keyword, page):
 
 
 def fetch(keywords):
+    """Live search. Returns (calls, reached) — reached is False when every request failed."""
     today = dt.date.today().isoformat()
     all_calls = {}  # keyed by topic identifier — deduplication built in
+    reached = False
     for keyword in keywords:
         for page in (1, 2):  # 2 pages = up to 100 results per keyword
             try:
                 results = search(keyword, page)
+                reached = True
             except Exception as e:
                 print(f"ERROR '{keyword}' p{page}: {e}", file=sys.stderr)
+                if not reached:
+                    break  # first request failed: the API is most likely blocked, don't hammer it
                 continue
             for item in results:
                 m = item.get("metadata", {})
@@ -88,7 +108,109 @@ def fetch(keywords):
                     "matched_keyword": keyword,
                 }
             time.sleep(0.3)
-    return list(all_calls.values())
+        if not reached:
+            break
+    return list(all_calls.values()), reached
+
+
+_mirror = None
+
+
+def load_mirror():
+    """All open/forthcoming topics from the GitHub mirror, plus the date it was built."""
+    global _mirror
+    if _mirror is None:
+        req = urllib.request.Request(MIRROR_URL, headers={"User-Agent": "research-funding-plugin"})
+        with urllib.request.urlopen(req, timeout=120) as r:
+            topics = json.loads(gzip.decompress(r.read()).decode("utf-8"))
+        built = "unknown"
+        try:
+            req = urllib.request.Request(MIRROR_MANIFEST, headers={"User-Agent": "research-funding-plugin"})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                built = json.load(r).get("built", "unknown")
+        except Exception:
+            pass
+        _mirror = (topics, built)
+    return _mirror
+
+
+STOP = {"and", "of", "the", "for", "in", "on", "to", "a", "with"}
+
+
+def stem(w):
+    # Crude English normalisation so "textiles" matches "textile" and "studies" matches "study".
+    if len(w) > 4 and w.endswith("ies"):
+        return w[:-3] + "y"
+    if len(w) > 3 and w.endswith("s") and not w.endswith(("ss", "us", "is")):
+        return w[:-1]
+    return w
+
+
+def words(text):
+    return {stem(w) for w in re.findall(r"[a-z0-9]+", str(text).lower()) if w not in STOP}
+
+
+def fetch_from_mirror(keywords):
+    """Local keyword search over the mirror, shaped like the live results."""
+    topics, built = load_mirror()
+    today = dt.date.today().isoformat()
+    all_calls = {}
+    for keyword in keywords:
+        kw = words(keyword)
+        if not kw:
+            continue
+        scored = []
+        for t in topics:
+            deadlines = t.get("deadlines") or []
+            if deadlines and deadlines[-1] < today:
+                continue
+            title, tags, body = words(t["title"]), words(" ".join(t.get("keywords") or [])), words(t.get("description", ""))
+            in_head = len(kw & (title | tags))
+            in_body = len(kw & body)
+            if in_head == 0 and in_body < len(kw):
+                continue  # a single word buried in a long description is not a match
+            scored.append((in_head * 3 + in_body, t))
+        for _, t in sorted(scored, key=lambda x: -x[0])[:100]:
+            if t["identifier"] in all_calls:
+                continue
+            deadlines = t.get("deadlines") or []
+            all_calls[t["identifier"]] = {
+                "identifier": t["identifier"],
+                "call_identifier": t.get("call_identifier", ""),
+                "title": t["title"],
+                "status_label": t["status_label"],
+                "deadline": next((d for d in deadlines if d >= today), deadlines[-1] if deadlines else ""),
+                "opening_date": t.get("opening_date", ""),
+                "budget_raw": t.get("budget_raw", ""),
+                "type": t.get("type", ""),
+                "url": t["url"],
+                "summary": t.get("description", "")[:500],
+                "matched_keyword": keyword,
+            }
+    return list(all_calls.values()), built
+
+
+def details(ids):
+    """Print each topic's full description (scope and Expected Outcome), live or from the mirror."""
+    for ident in ids:
+        text, source = "", ""
+        try:
+            r = requests.get(TOPIC_URL.format(ident.lower()), timeout=30)
+            r.raise_for_status()
+            raw = r.json().get("TopicDetails", {}).get("description", "")
+            text = re.sub(r"\n{3,}", "\n\n", re.sub(r"<[^>]+>", "\n", raw))
+            source = "EU Funding & Tenders Portal"
+        except Exception:
+            try:
+                topics, built = load_mirror()
+                t = next((t for t in topics if t["identifier"].lower() == ident.lower()), None)
+                if t:
+                    text, source = t.get("description", ""), f"GitHub mirror built {built}"
+            except Exception as e:
+                source = f"not available ({e})"
+        print(f"===== {ident}  [source: {source or 'not found'}]")
+        print(html.unescape(text).strip()[:12000] or "No description found for this identifier.")
+        print()
 
 
 def parse_budget(raw):
@@ -131,10 +253,24 @@ def cluster(ident):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="calls_verified.json")
+    ap.add_argument("--details", action="store_true", help="Treat the arguments as topic IDs and print their full text")
     ap.add_argument("keywords", nargs="+")
     args = ap.parse_args()
 
-    calls = fetch(args.keywords)
+    if args.details:
+        details(args.keywords)
+        return
+
+    calls, reached = fetch(args.keywords)
+    source = "EU Funding & Tenders API (live)"
+    if not reached:
+        print("The EU Funding & Tenders API is not reachable from here. Using the GitHub mirror ...", file=sys.stderr)
+        try:
+            calls, built = fetch_from_mirror(args.keywords)
+            source = f"GitHub mirror of the EU Funding & Tenders API, built {built}"
+        except Exception as e:
+            print(f"ERROR: the GitHub mirror is not reachable either ({e}). No verified calls available.")
+            sys.exit(1)
     for c in calls:
         c["budget"] = parse_budget(c.pop("budget_raw"))
         c["cluster"] = cluster(c["identifier"])
@@ -144,6 +280,7 @@ def main():
         json.dump(calls, f, indent=2, ensure_ascii=False)
 
     print(f"Verified OPEN/FORTHCOMING Horizon Europe calls: {len(calls)}  (saved to {args.out})")
+    print(f"Source: {source}")
     print(f"{'IDENTIFIER':<50} {'STATUS':<12} {'DEADLINE':<11} TITLE")
     for c in calls:
         print(f"{c['identifier']:<50} {c['status_label']:<12} {c['deadline']:<11} {c['title'][:70]}")

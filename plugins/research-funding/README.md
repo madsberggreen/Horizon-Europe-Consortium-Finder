@@ -1,6 +1,13 @@
-# research-funding v2.6.1
+# research-funding v2.7.0
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v2.7.0
+
+- **Works when EU servers are blocked.** Claude's sandbox often only allows GitHub and package registries. A weekly GitHub Action (`.github/workflows/data-mirror.yml`, script `tools/build_data_mirror.py`) mirrors all open and forthcoming Horizon Europe topics (with full descriptions) and the CORDIS extracts to the repository's `data` branch. `fetch_calls.py` and `download_cordis.py` try the EU first and fall back to the mirror by themselves, and say which source they used.
+- `fetch_calls.py --details TOPIC-ID ...` prints a topic's full text, so expected outcomes are quoted verbatim instead of paraphrased from web search.
+- The skills no longer reconstruct calls from web search or work programmes; web search is a last resort for CORDIS only.
+- The mirror pages the portal search with a fixed sort (unsorted paging silently skipped about 60 of 800 topics) and keeps CORDIS projects whose descriptions contain semicolons, which the official files make pandas skip (about 200 projects).
 
 ## What changed in v2.6.1
 

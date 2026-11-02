@@ -15,7 +15,7 @@ Derive 10–15 keywords from the profile (one per research area — fundable-top
 python "<skill-dir>/scripts/fetch_calls.py" --out /tmp/calls_verified.json "kw1" "kw2" ...
 ```
 
-The script filters to OPEN/FORTHCOMING Horizon Europe only, dedupes, builds canonical topic URLs, parses budgets, infers clusters, and prints a compact `identifier | status | deadline | title` table.
+The script filters to OPEN/FORTHCOMING Horizon Europe only, dedupes, builds canonical topic URLs, parses budgets, infers clusters, and prints a compact `identifier | status | deadline | title` table plus a `Source:` line. If the EU API is blocked from this environment, it uses the repository's weekly GitHub mirror of the same API by itself — the data is equivalent, so treat it as verified and never fall back to web search or work programme PDFs. Put the `Source:` line in the Markdown header. Only if the script exits 1 (EU API and mirror both unreachable) stop the call-matching step and tell the user that no verified calls could be fetched; do not reconstruct calls from web search.
 
 **The identifiers in the output are the ONLY valid identifiers. Never invent or approximate a call.** If the sweep yields few matches, report that honestly — a short real list beats a long invented one.
 
@@ -23,7 +23,11 @@ The script filters to OPEN/FORTHCOMING Horizon Europe only, dedupes, builds cano
 
 1. From the printed table alone, pick the ~25 plausible candidates by title/cluster.
 2. Read the `summary` field from the JSON **only for those candidates**.
-3. WebFetch the portal topic page only for the final shortlist (score ≥ 14) to confirm scope and copy expected outcomes verbatim.
+3. For the final shortlist (score ≥ 14) only, get the full topic text and copy the expected outcomes **verbatim** from it:
+   ```bash
+   python "<skill-dir>/scripts/fetch_calls.py" --details TOPIC-ID-1 TOPIC-ID-2 ...
+   ```
+   It reads the portal, or the mirror when the portal is blocked. Never paraphrase expected outcomes.
 
 ## Step 3 — Score 1–20, holistically
 

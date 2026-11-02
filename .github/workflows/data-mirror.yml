@@ -1,0 +1,37 @@
+# Weekly copy of the EU data the plugin needs, for users whose Claude sandbox can't reach EU servers.
+# Builds open Horizon Europe topics + trimmed CORDIS extracts and force-pushes them to the `data` branch
+# (one commit, no history), where the plugin reads them from raw.githubusercontent.com.
+name: Data mirror
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"   # Mondays 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - name: Build mirror
+        run: python tools/build_data_mirror.py --out mirror
+      - name: Publish to the data branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp tools/data-branch-README.md mirror/README.md
+          cd mirror
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Data mirror $(date -u +%F)"
+          git push -q --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" data

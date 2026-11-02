@@ -37,7 +37,7 @@ python "<skill-dir>/scripts/analyse_cordis.py" \
 
 The script does all joins (projects, organisations, topics, policyPriorities, deliverables, publications) and computes per organisation: projects-in-topic, coordinator count, EC contribution in topic, total HEU projects (EU experience), relevance ratio, power-broker flag (≥100 projects); plus country distribution with under-representation flag, policy-flag percentages, deliverable-type patterns, and publication-based warm-lead candidates. It prints a compact summary; detail is in the JSON.
 
-If `download_cordis.py` exits 1 (no network access to cordis.europa.eu and no local copy), fall back to web search on cordis.europa.eu and prefix the output with: "⚠️ Based on web search — CORDIS bulk data could not be downloaded. Allow access to cordis.europa.eu, or download the four `cordis-HORIZON*-csv.zip` files from https://cordis.europa.eu/data/ and unzip them into `cordis-data/`." In the status message, state the CORDIS download date from `cordis-data/SOURCE.txt`.
+If cordis.europa.eu is blocked, `download_cordis.py` uses the repository's weekly GitHub mirror of the same extracts by itself; the analysis is identical, so run it normally. Only if it exits 1 (both unreachable and no local copy) fall back to web search on cordis.europa.eu and prefix the output with: "⚠️ Based on web search — CORDIS bulk data could not be downloaded." In the status message, state the CORDIS source and data date from `cordis-data/SOURCE.txt`.
 
 ## Step 2 — Interpret (the judgment steps)
 

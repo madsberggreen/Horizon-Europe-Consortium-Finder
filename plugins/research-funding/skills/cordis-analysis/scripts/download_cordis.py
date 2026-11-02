@@ -8,12 +8,18 @@ refreshes it when it gets old. CORDIS republishes the extracts roughly monthly.
 Usage:
     python download_cordis.py --data-dir "<workspace>/cordis-data" [--max-age 30] [--force]
 
-Exit codes: 0 = data ready (fresh or just downloaded), 1 = download failed and no
+If cordis.europa.eu is blocked (Claude's sandbox often only allows GitHub and package
+registries), the script falls back to the repository's weekly GitHub mirror of the same data.
+
+Exit codes: 0 = data ready (fresh or just downloaded), 1 = both sources failed and no
 usable local copy exists. If a download fails but an older copy exists, the old copy
 is kept, a warning is printed and the exit code is 0.
 """
 import argparse
 import datetime as dt
+import gzip
+import json
+import os
 import shutil
 import sys
 import tempfile
@@ -31,6 +37,10 @@ ZIPS = [
 REQUIRED = ["project.csv", "organization.csv", "topics.csv", "policyPriorities.csv",
             "projectDeliverables.csv", "projectPublications.csv"]
 STAMP = "SOURCE.txt"
+# Weekly copy of the same extracts (trimmed to the columns analyse_cordis.py reads), built by the
+# repository's GitHub Action. Claude's sandbox allows GitHub by default but often blocks cordis.europa.eu.
+MIRROR_URL = os.environ.get(  # override only for testing
+    "RF_MIRROR_BASE", "https://raw.githubusercontent.com/madsberggreen/Horizon-Europe-Consortium-Finder/data/")
 
 
 def downloaded_on(data_dir):
@@ -70,7 +80,29 @@ def download_all(data_dir):
             shutil.move(str(csv), data_dir / csv.name)
     (data_dir / STAMP).write_text(
         f"source: {BASE_URL} (official CORDIS Horizon Europe bulk extracts)\n"
-        f"downloaded: {dt.date.today().isoformat()}\n", encoding="utf-8")
+        f"downloaded: {dt.date.today().isoformat()}\n"
+        f"data date: {dt.date.today().isoformat()}\n", encoding="utf-8")
+
+
+def fetch_url(url, timeout=300):
+    req = urllib.request.Request(url, headers={"User-Agent": "research-funding-plugin"})
+    return urllib.request.urlopen(req, timeout=timeout)
+
+
+def download_mirror(data_dir):
+    with fetch_url(MIRROR_URL + "manifest.json", timeout=60) as r:
+        built = json.load(r).get("built", "unknown")
+    data_dir.mkdir(parents=True, exist_ok=True)
+    for name in REQUIRED:
+        print(f"Downloading {name} from the GitHub mirror ...", flush=True)
+        with fetch_url(MIRROR_URL + f"cordis/{name}.gz") as r, gzip.open(r) as src, \
+                open(data_dir / name, "wb") as dst:
+            shutil.copyfileobj(src, dst)
+    (data_dir / STAMP).write_text(
+        f"source: {MIRROR_URL} (weekly mirror of the CORDIS extracts; cordis.europa.eu was not reachable)\n"
+        f"downloaded: {dt.date.today().isoformat()}\n"
+        f"data date: {built}\n", encoding="utf-8")
+    return built
 
 
 def main():
@@ -90,21 +122,27 @@ def main():
         if when is None:
             print("CORDIS data present but download date unknown — refreshing.")
 
+    source = "cordis.europa.eu"
     try:
         download_all(data_dir)
     except Exception as e:  # network blocked, portal down, disk full ...
-        if present:
-            print(f"WARNING: refresh failed ({e}). Using existing local copy"
-                  + (f" from {when}." if when else "."))
-            return 0
-        print(f"ERROR: could not download CORDIS data ({e}).")
-        return 1
+        print(f"cordis.europa.eu not reachable ({e}). Trying the GitHub mirror ...", flush=True)
+        try:
+            source = f"GitHub mirror, data from {download_mirror(data_dir)}"
+        except Exception as e2:
+            if present:
+                print(f"WARNING: refresh failed ({e2}). Using existing local copy"
+                      + (f" from {when}." if when else "."))
+                return 0
+            print(f"ERROR: could not download CORDIS data from cordis.europa.eu ({e}) "
+                  f"or the GitHub mirror ({e2}).")
+            return 1
 
     if not has_required(data_dir):
         print("ERROR: download finished but expected files are missing: "
               + ", ".join(f for f in REQUIRED if not (data_dir / f).exists()))
         return 1
-    print(f"CORDIS data ready in {data_dir} (downloaded {dt.date.today()}).")
+    print(f"CORDIS data ready in {data_dir} (downloaded {dt.date.today()}, source: {source}).")
     return 0
 
 
