@@ -1,7 +1,7 @@
 # Horizon Europe Consortium Finder
 App that helps you identify and join a Horizon Europe consortium as a researcher
 
-Delivered as a Claude plugin, `research-funding`. For a named researcher it builds a funding profile, matches open Horizon Europe calls, writes a Proposal Intelligence briefing, finds consortium partners in CORDIS, drafts work package lead pitch letters and combines everything in one HTML report.
+Delivered as a Claude plugin, `horizon-europe-consortium-finder` (called `research-funding` before version 3.0.0). For a named researcher it builds a funding profile, matches open Horizon Europe calls, writes a Proposal Intelligence briefing, finds consortium partners in CORDIS, drafts work package lead pitch letters and combines everything in one HTML report.
 
 ## Install
 
@@ -9,7 +9,7 @@ Delivered as a Claude plugin, `research-funding`. For a named researcher it buil
 
 ```
 /plugin marketplace add madsberggreen/Horizon-Europe-Consortium-Finder
-/plugin install research-funding@horizon-europe-consortium-finder
+/plugin install horizon-europe-consortium-finder@horizon-europe-consortium-finder
 ```
 
 **Claude desktop app / Cowork** (paid plan required):
@@ -17,17 +17,18 @@ Delivered as a Claude plugin, `research-funding`. For a named researcher it buil
 1. In Claude, open **Customize** in the left sidebar (in Cowork, open the **Cowork** tab first) and go to **Plugins**.
 2. Click **Add** → **Add marketplace** → **Add from a repository**.
 3. Enter `madsberggreen/Horizon-Europe-Consortium-Finder`.
-4. Open the **Discover** tab and search for **Horizon Europe Consortium Finder** (technical name `research-funding`). Select it and click **Add**.
-5. Type `/start` in a new chat. In Cowork the full command is `/research-funding:start`.
+4. Open the **Discover** tab and search for **Horizon Europe Consortium Finder**. Select it and click **Add**.
+5. Type `/start` in a new chat. In Cowork the full command is `/horizon-europe-consortium-finder:start`.
 
 **Updates** come from the marketplace, not from the plugin itself: on the **Plugins** page, select **Check for updates** on the marketplace `horizon-europe-consortium-finder`, or turn on **Sync automatically** so new versions arrive without you doing anything.
 
 **Can't find it?**
-- Select **Check for updates** on the marketplace first. A marketplace added before version 2.5.1 only knows the plugin as `research-funding` until it has been updated.
+- Select **Check for updates** on the marketplace first. Until it has been updated, the marketplace only knows the plugin by its old name, `research-funding`.
+- **Had the old `research-funding` plugin installed?** From version 3.0.0 the plugin has a new technical name, so Claude sees it as a new plugin. Remove `research-funding` on the **Plugins** page and add **Horizon Europe Consortium Finder** instead.
 - Check that the marketplace was added: it should be listed on the **Plugins** page. If adding it failed, your organization may restrict which marketplaces you can add. Ask your Claude administrator, or install from a file (below).
 - Cowork requires a paid plan (Pro, Max, Team or Enterprise).
 
-**Alternative: install from a file.** Download `research-funding-<version>.plugin` from the latest release on the **Releases** page, then upload it under **Customize** → **Plugins**. To update, upload the new file.
+**Alternative: install from a file.** Download `horizon-europe-consortium-finder-<version>.plugin` from the latest release on the **Releases** page, then upload it under **Customize** → **Plugins**. To update, upload the new file.
 
 If your organization restricts which marketplaces you may add, ask your Claude administrator to allow this repository or to add the plugin for everyone.
 

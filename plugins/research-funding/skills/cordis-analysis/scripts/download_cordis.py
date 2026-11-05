@@ -85,7 +85,7 @@ def download_all(data_dir):
 
 
 def fetch_url(url, timeout=300):
-    req = urllib.request.Request(url, headers={"User-Agent": "research-funding-plugin"})
+    req = urllib.request.Request(url, headers={"User-Agent": "horizon-europe-consortium-finder-plugin"})
     return urllib.request.urlopen(req, timeout=timeout)
 
 

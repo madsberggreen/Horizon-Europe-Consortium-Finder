@@ -120,12 +120,12 @@ def load_mirror():
     """All open/forthcoming topics from the GitHub mirror, plus the date it was built."""
     global _mirror
     if _mirror is None:
-        req = urllib.request.Request(MIRROR_URL, headers={"User-Agent": "research-funding-plugin"})
+        req = urllib.request.Request(MIRROR_URL, headers={"User-Agent": "horizon-europe-consortium-finder-plugin"})
         with urllib.request.urlopen(req, timeout=120) as r:
             topics = json.loads(gzip.decompress(r.read()).decode("utf-8"))
         built = "unknown"
         try:
-            req = urllib.request.Request(MIRROR_MANIFEST, headers={"User-Agent": "research-funding-plugin"})
+            req = urllib.request.Request(MIRROR_MANIFEST, headers={"User-Agent": "horizon-europe-consortium-finder-plugin"})
             with urllib.request.urlopen(req, timeout=30) as r:
                 built = json.load(r).get("built", "unknown")
         except Exception:

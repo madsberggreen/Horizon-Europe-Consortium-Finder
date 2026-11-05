@@ -8,7 +8,7 @@ Ejer: Mads Lykke Berggreen (GitHub: madsberggreen). Repository: https://github.c
 
 ## Status
 
-Første version deles som Claude-plugin (`plugins/research-funding`, v2.1.0), som kolleger installerer fra dette repository (`.claude-plugin/marketplace.json`). Senere overvejer Mads, om det skal blive en egentlig webapp. En færdig Lovable-byggeplan ligger i Cowork-projektet `OneDrive - ViaUC\Dokumenter\Claude\Projects\Horizon Europe Automated\Lovable-Import`.
+Første version deles som Claude-plugin (`plugins/research-funding`, teknisk navn `horizon-europe-consortium-finder` fra v3.0.0; mappen hedder stadig `research-funding`), som kolleger installerer fra dette repository (`.claude-plugin/marketplace.json`). Senere overvejer Mads, om det skal blive en egentlig webapp. En færdig Lovable-byggeplan ligger i Cowork-projektet `OneDrive - ViaUC\Dokumenter\Claude\Projects\Horizon Europe Automated\Lovable-Import`.
 
 Pluginet kommer fra `plugin-src/research-funding` i samme Cowork-projekt, men **dette repository er nu den gældende version**. Ret her, ikke i Cowork-kopien.
 

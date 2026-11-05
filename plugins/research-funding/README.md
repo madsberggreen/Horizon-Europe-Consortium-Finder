@@ -1,6 +1,13 @@
-# research-funding v2.7.0
+# Horizon Europe Consortium Finder v3.0.0
+
+Technical name `horizon-europe-consortium-finder` (before v3.0.0: `research-funding`).
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v3.0.0
+
+- **New technical name: `horizon-europe-consortium-finder`** (was `research-funding`). Claude's plugin search matches the technical name, so the plugin was only found by searching for "research funding". Commands now start with the new name, for example `/horizon-europe-consortium-finder:start`; plain `/start` still works.
+- Claude sees the renamed plugin as a new plugin. Anyone with `research-funding` installed should remove it and add Horizon Europe Consortium Finder instead.
 
 ## What changed in v2.7.0
 
