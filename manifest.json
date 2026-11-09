@@ -1,0 +1,16 @@
+{
+  "built": "2026-11-09",
+  "calls": 324,
+  "cordis_rows": {
+    "organization.csv": 148155,
+    "project.csv": 23954,
+    "topics.csv": 23954,
+    "policyPriorities.csv": 114757,
+    "projectDeliverables.csv": 63280,
+    "projectPublications.csv": 95405
+  },
+  "sources": {
+    "calls": "https://api.tech.ec.europa.eu/search-api/prod/rest/search",
+    "cordis": "https://cordis.europa.eu/data/"
+  }
+}
