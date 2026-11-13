@@ -16,6 +16,12 @@ Exit code 0 = pass; non-zero = failures printed to stdout. Fix and re-run until 
 import re
 import sys
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 def verify(text: str, kind: str) -> list:
     failures = []

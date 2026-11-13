@@ -11,6 +11,12 @@ length <= ~400 words body. Exit 0 = pass.
 import re
 import sys
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 def verify(letter: str, topic_id: str, expected_outcomes: list) -> list:
     failures = []

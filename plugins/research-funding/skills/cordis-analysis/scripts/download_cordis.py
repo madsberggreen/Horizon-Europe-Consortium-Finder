@@ -27,6 +27,12 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 BASE_URL = "https://cordis.europa.eu/data/"
 ZIPS = [
     "cordis-HORIZONprojects-csv.zip",             # project, organization, topics, policyPriorities, euroSciVoc, ...

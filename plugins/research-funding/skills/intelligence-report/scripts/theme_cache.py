@@ -35,8 +35,15 @@ import shutil
 import sys
 from pathlib import Path
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 KINDS = ("intelligence", "cordis")
 DEFAULT_TTL = 60
+MIN_HIT_SHARE = 0.4
 STOP = {"and", "of", "the", "for", "in", "on", "to", "with", "a", "eu", "european"}
 
 
@@ -94,8 +101,15 @@ def score_theme(theme, kws, cluster):
     s = len(hits) / len(kws)
     if cluster and any(cluster.upper().startswith(c.upper()) or c.upper().startswith(cluster.upper())
                        for c in theme.get("clusters", [])):
-        s += 0.15
+        s += 0.15  # ranks themes of the same cluster first; never enough for a match on its own
     return round(min(s, 1.0), 3), hits
+
+
+def confident(hits, kws):
+    """A theme is only reused when the query really overlaps it: at least two matched
+    keywords (one, if only one was asked) AND at least 40% of all query keywords.
+    One shared phrase such as 'creative industries' is not the same subtheme."""
+    return len(hits) >= min(2, len(kws)) and len(hits) / max(len(kws), 1) >= MIN_HIT_SHARE
 
 
 def artifacts(root, slug, kind):
@@ -139,9 +153,11 @@ def cmd_resolve(args):
     if not ranked:
         print("\nNO MATCH — theme cache is empty. Generate fresh, then `new` + `store`.")
         sys.exit(4)
+    ranked = [r for r in ranked if confident(r[1], args.keywords)] or ranked
     best_s, best_hits, best = ranked[0]
-    if best_s < args.threshold:
-        print(f"\nNO CONFIDENT MATCH (best {best_s:.2f} < {args.threshold}).")
+    if best_s < args.threshold or not confident(best_hits, args.keywords):
+        print(f"\nNO CONFIDENT MATCH (closest: {best['slug']}, {len(best_hits)} of {len(args.keywords)} keywords "
+              f"matched; a match needs at least {min(2, len(args.keywords))} and {int(MIN_HIT_SHARE * 100)}%).")
         print("→ Generate fresh, then register the new subtheme with `theme_cache.py new`.")
         return 4
 
@@ -210,6 +226,57 @@ def cmd_new(args):
     return 0
 
 
+# Sections that describe one researcher, not the theme. They are removed before caching
+# and written fresh for every researcher.
+PRIVATE_SECTIONS = ("GEOGRAPHIC GAP", "KEY CONTACTS", "STRATEGIC ASSESSMENT", "WARM CONTACT",
+                    "YOUR IDEA", "INTENDED DIRECTION")
+PRIVATE_JSON_KEYS = ("researcher", "institution", "strategic_assessment", "targets", "gaps", "title_line2")
+
+
+def is_private(heading):
+    h = re.sub(r"[^A-Z ]", " ", str(heading).upper())
+    return any(p in h for p in PRIVATE_SECTIONS)
+
+
+def scrub_names(text, names):
+    for n in sorted({n for n in names if n and len(n) > 3}, key=len, reverse=True):
+        text = re.sub(re.escape(n), "the researcher", text, flags=re.I)
+    return text
+
+
+def sanitise_md(text, names):
+    """Drop researcher-specific sections and header lines; replace any remaining name."""
+    out, skip, removed = [], False, []
+    for line in text.replace("\r\n", "\n").split("\n"):
+        m = re.match(r"(#{1,6})\s+(.*)", line)
+        if m:
+            if len(m.group(1)) == 1:      # H1: keep the title, drop the researcher's name after the dash
+                line = re.split(r"\s+[—–-]\s+", line, maxsplit=1)[0]
+                skip = False
+            else:
+                skip = is_private(m.group(2))
+                if skip:
+                    removed.append(m.group(2).strip())
+        if skip:
+            continue
+        if re.match(r"\s*_.*(?<![A-Za-z])(Researcher|Requested by)\s*:", line):
+            line = re.sub(r"(?<![A-Za-z])(Researcher|Requested by)\s*:[^|_]*\|?\s*", "", line)
+        out.append(line)
+    return scrub_names("\n".join(out), names), removed
+
+
+def sanitise_json(text, names):
+    data = json.loads(text)
+    removed = [k for k in PRIVATE_JSON_KEYS if k in data]
+    for k in removed:
+        data.pop(k)
+    if isinstance(data.get("sections"), list):
+        keep = [s for s in data["sections"] if not is_private(s.get("heading", ""))]
+        removed += [s.get("heading", "") for s in data["sections"] if s not in keep]
+        data["sections"] = keep
+    return scrub_names(json.dumps(data, ensure_ascii=False, indent=1), names), removed
+
+
 def cmd_store(args):
     root = root_dir(args)
     tax = load_tax(root)
@@ -223,8 +290,16 @@ def cmd_store(args):
     dest_dir = root / args.slug
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest = dest_dir / f"{args.kind}-{date}{src.suffix}"
-    shutil.copy2(src, dest)
+    names = list(theme.get("researchers", [])) + ([args.researcher] if args.researcher else [])
+    text = src.read_text(encoding="utf-8")
+    if src.suffix.lower() == ".json":
+        text, removed = sanitise_json(text, names)
+    else:
+        text, removed = sanitise_md(text, names)
+    dest.write_text(text, encoding="utf-8")
     print(f"Stored: {dest}")
+    if removed:
+        print("  Researcher-specific parts left out of the cache: " + ", ".join(removed))
     if args.researcher and args.researcher not in theme.get("researchers", []):
         theme.setdefault("researchers", []).append(args.researcher)
         save_tax(root, tax)
@@ -266,6 +341,9 @@ def cmd_fetch(args):
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(out_text, encoding="utf-8")
     print(f"Fetched {args.kind} for theme {args.slug} ({age} days old) → {out}")
+    print("  The cache holds the theme landscape only. Write the researcher-specific parts fresh "
+          "(CORDIS: GEOGRAPHIC GAP ANALYSIS, WARM CONTACT LEADS, KEY CONTACTS, STRATEGIC ASSESSMENT; "
+          "in the JSON: researcher, institution, gaps, targets, strategic_assessment, title_line2).")
 
     sidecar = path.with_suffix(".json")
     if sidecar.exists():

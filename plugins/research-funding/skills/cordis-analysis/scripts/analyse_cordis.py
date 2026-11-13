@@ -21,10 +21,22 @@ from pathlib import Path
 
 import pandas as pd
 
+import sys
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 
 # download_cordis.py stores the official file names; older workspaces used renamed copies.
 ALT_NAMES = {"cordis-HORIZONprojects.csv": "project.csv",
              "cordis-HORIZONorganizations.csv": "organization.csv"}
+
+
+MIN_PARTNERS = 3     # a "consortium" has at least this many partners
+MIN_CONSORTIA = 20   # below this, country shares in a theme are noise
+UNDER_RATIO = 0.75   # theme share below 75% of the country's overall share = underrepresented
 
 
 def read(data_dir, name):
@@ -88,12 +100,38 @@ def main():
     top = top.fillna({"country": "", "activity": "", "org_url": "", "org_id": ""})
 
     # --- Geographic gap ---
+    # Counted over real consortia only (3+ partners): almost half of all Horizon Europe projects
+    # have a single beneficiary (ERC, MSCA fellowships) and would drag every country's share down.
+    # A country is "underrepresented" when its share in this theme is clearly below its share of
+    # ALL Horizon Europe consortia - a fixed threshold would flag every small country.
     n_proj = len(sel_ids)
-    country_counts = (o.groupby("country")["projectID"].nunique()
-                      .sort_values(ascending=False))
-    country_pct = (country_counts / n_proj * 100).round(1)
     home = args.country.upper()
-    home_pct = float(country_pct.get(home, 0.0))
+    partners = orgs.groupby("projectID")["name"].nunique()
+    consortia_all = set(partners[partners >= MIN_PARTNERS].index)
+    consortia_theme = sel_ids & consortia_all
+    n_cons = len(consortia_theme)
+
+    def share(project_ids, country=None):
+        sub = orgs[orgs["projectID"].isin(project_ids)]
+        if country:
+            return 100.0 * sub[sub["country"] == country]["projectID"].nunique() / max(len(project_ids), 1)
+        return (sub.groupby("country")["projectID"].nunique().sort_values(ascending=False)
+                / max(len(project_ids), 1) * 100).round(1)
+
+    country_pct = share(consortia_theme)
+    home_pct = round(share(consortia_theme, home), 1)
+    home_base = round(share(consortia_all, home), 1)
+    home_ratio = round(home_pct / home_base, 2) if home_base else None
+    enough = n_cons >= MIN_CONSORTIA
+    under = bool(enough and home_ratio is not None and home_ratio < UNDER_RATIO)
+    if not enough:
+        geo_verdict = (f"too few consortia in this theme ({n_cons}) to judge - "
+                       "do not use a geographic-balance argument")
+    elif under:
+        geo_verdict = ("UNDERREPRESENTED in this theme compared with its usual share - "
+                       "the geographic-balance argument can be used, quoting both numbers")
+    else:
+        geo_verdict = "not underrepresented - do NOT use a geographic-balance argument"
 
     # --- Policy flags ---
     policy = {}
@@ -149,9 +187,14 @@ def main():
              "url": f"https://cordis.europa.eu/project/id/{r['id']}"}
             for _, r in sel.sort_values("ecMaxContribution", key=lambda s: pd.to_numeric(s, errors="coerce"),
                                         ascending=False).head(15).fillna("").iterrows()],
-        "geography": {"top_countries_pct": country_pct.head(10).to_dict(),
+        "geography": {"basis": f"consortia with {MIN_PARTNERS}+ partners",
+                      "consortia_in_theme": n_cons,
+                      "top_countries_pct": country_pct.head(10).to_dict(),
                       "home_country": home, "home_country_pct": home_pct,
-                      "home_underrepresented": home_pct < 10.0},
+                      "home_country_pct_all_heu_consortia": home_base,
+                      "home_ratio_theme_vs_all": home_ratio,
+                      "home_underrepresented": under,
+                      "verdict": geo_verdict},
         "policy_flags_pct": policy,
         "deliverable_types": deliv_types,
         "publication_leads": warm[:40],
@@ -168,7 +211,9 @@ def main():
               f"coord:{r['coordinator_in_topic']:>2} EC:€{r['ec_in_topic_eur']/1e6:>6.1f}M "
               f"rel:{r['relevance_ratio']:.2f} total:{r['total_heu_projects']}{pb}")
     print(f"\nGEOGRAPHY: top {', '.join(f'{k} {v}%' for k, v in list(result['geography']['top_countries_pct'].items())[:5])}")
-    print(f"  {home}: {home_pct}% of consortia -> {'UNDERREPRESENTED - use the geographic-balance argument' if home_pct < 10 else 'well represented'}")
+    print(f"  (share of the {n_cons} consortia with {MIN_PARTNERS}+ partners in this theme)")
+    print(f"  {home}: in {home_pct}% of consortia in this theme vs {home_base}% of all Horizon Europe consortia "
+          f"-> {geo_verdict}")
     if policy:
         print(f"POLICY FLAGS: {', '.join(f'{k} {v}%' for k, v in sorted(policy.items(), key=lambda x: -x[1]))}")
     if deliv_types:

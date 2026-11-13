@@ -21,6 +21,12 @@ import sys
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 TIMEOUT = 8
 UA = {"User-Agent": "horizon-europe-consortium-finder-plugin"}
 MIRROR = "https://raw.githubusercontent.com/madsberggreen/Horizon-Europe-Consortium-Finder/data/manifest.json"

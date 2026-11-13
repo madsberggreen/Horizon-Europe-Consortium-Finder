@@ -31,7 +31,7 @@ python "<skill-dir>/scripts/theme_cache.py" --root "<workspace>/themes" \
       --out "researchers/[Name]/intelligence/[name]-intelligence-[YYYY-MM-DD].md"
   ```
   The fetched file carries a provenance banner. Regenerate the PDF from the copied `.json` sidecar so the researcher still gets a PDF in their folder.
-- **exit 3 (STALE/MISSING)** — research fresh as below, then `store --slug <slug> --kind intelligence` both the `.md` and the `report_data.json`.
+- **exit 3 (STALE/MISSING)** — research fresh as below, then `store --slug <slug> --kind intelligence --researcher "[Name]"` both the `.md` and the `report_data.json`. `store` leaves the researcher's name, `title_line2` and any YOUR IDEA section out of the cache by itself; keep the five landscape sections free of the researcher's name, institution and projects, because the next researcher in the subtheme gets the same text. After a `fetch`, set `title_line2` again before rendering the PDF.
 - **exit 4 (no match)** — research fresh, then register the subtheme with `new` and store. Keep subthemes narrower than a cluster: CL2 alone spans didactics, democracy and heritage, which share no policy landscape.
 
 Override with `--ttl 0` when the user explicitly wants everything regenerated.

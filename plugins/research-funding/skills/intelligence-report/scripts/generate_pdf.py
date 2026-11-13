@@ -21,6 +21,12 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
 from reportlab.platypus.flowables import Flowable
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 # ── Colour palette ────────────────────────────────────────────────────────────
 NAVY        = HexColor("#1F3864")   # title box background
 SECTION_BLUE = HexColor("#2F5597")  # section heading text + rule

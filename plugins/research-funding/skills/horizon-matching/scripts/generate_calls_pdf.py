@@ -31,6 +31,12 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 EU_BLUE = colors.HexColor("#003399")
 MID_BLUE = colors.HexColor("#1A4A8C")
 DARK_BLUE = colors.HexColor("#1A3A7A")

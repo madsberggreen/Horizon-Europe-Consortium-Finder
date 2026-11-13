@@ -11,6 +11,10 @@ Consolidated Horizon Europe pipeline — single source of truth replacing both t
 - **`/add-researcher` and `/update-profiles` stop at once when blocked**, before building the profile, and give the same instructions in the user's language. Call matching and CORDIS failures later in a run point to the same instructions.
 - ORCID being blocked is now a warning, not a silent gap: the profile says it was built without ORCID.
 - The repository README has a "Before first use" section with the domain list.
+- **Scripts no longer crash on Windows.** Call search and the theme cache printed characters the Windows console can't show and stopped with `UnicodeEncodeError`. Every script now writes UTF-8.
+- **Budget per topic.** `fetch_calls.py` showed the whole parent call's budget on every topic (EUR 277M on all 24 topics of one Cluster 2 call). It now shows the topic's own budget with the expected number and size of grants.
+- **Theme cache: stricter reuse, no researcher data.** A theme is reused only when at least two query keywords and 40% of them match (before, one shared phrase plus the same cluster was enough, so a museum researcher got an AI landscape). `store` now leaves out the researcher-specific sections, JSON fields and the researcher's name.
+- **Geographic argument fixed.** A country was called underrepresented below a fixed 10% of all matched projects, which flagged nearly every small country. Shares are now counted over consortia with 3+ partners and compared with the country's share of all Horizon Europe consortia; the argument is only used when the script says so.
 
 ## What changed in v3.0.0
 

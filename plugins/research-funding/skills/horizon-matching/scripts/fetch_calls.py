@@ -26,6 +26,12 @@ import urllib.request
 
 import requests
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 API_URL = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
 TOPIC_URL = "https://ec.europa.eu/info/funding-tenders/opportunities/data/topicDetails/{}.json"
 MIRROR_BASE = os.environ.get(  # override only for testing
@@ -213,23 +219,55 @@ def details(ids):
         print()
 
 
-def parse_budget(raw):
-    """Human-readable budget from the API's raw budget JSON."""
-    if not raw or raw in ("", "None", "[]"):
+def parse_budget(raw, ident):
+    """This topic's own budget from the API's raw budget JSON.
+
+    The JSON lists every topic of the parent call, so only the actions whose name starts
+    with this topic's identifier count. Returns e.g. "EUR 20.0M (about 5 grants of EUR 3.5-4.0M)".
+    """
+    if not raw or raw in ("", "None", "[]", "{}"):
         return "See portal"
     try:
         data = json.loads(raw) if isinstance(raw, str) else raw
     except Exception:
         return "See portal"
-    total = 0
-    for actions in data.get("budgetTopicActionMap", {}).values():
-        for action in actions:
-            for v in action.get("budgetYearMap", {}).values():
+    total, grants, lo, hi = 0, 0, None, None
+    seen = set()  # some topics repeat one shared budget for each action type (e.g. MSCA DN / DN-JD / DN-ID)
+    for actions in (data.get("budgetTopicActionMap") or {}).values():
+        for action in actions or []:
+            name = str(action.get("action", "")).strip().upper()
+            if not (name == ident.upper() or name.startswith(ident.upper() + " ")):
+                continue
+            shared = tuple(sorted((str(k), str(v)) for k, v in (action.get("budgetYearMap") or {}).items()))
+            if shared in seen:
+                continue
+            seen.add(shared)
+            for v in (action.get("budgetYearMap") or {}).values():
                 try:
-                    total += int(v)
+                    total += int(float(v))
                 except Exception:
                     pass
-    return f"EUR {total/1_000_000:.1f}M" if total > 0 else "See portal"
+            try:
+                grants += int(action.get("expectedGrants") or 0)
+            except Exception:
+                pass
+            for key, pick in (("minContribution", min), ("maxContribution", max)):
+                try:
+                    val = float(action.get(key) or 0)
+                except Exception:
+                    val = 0
+                if val > 0:
+                    if key == "minContribution":
+                        lo = val if lo is None else pick(lo, val)
+                    else:
+                        hi = val if hi is None else pick(hi, val)
+    if total <= 0:
+        return "See portal"
+    text = f"EUR {total/1_000_000:.1f}M"
+    if grants and lo and hi:
+        size = f"EUR {lo/1e6:.1f}M" if lo == hi else f"EUR {lo/1e6:.1f}-{hi/1e6:.1f}M"
+        text += f" (about {grants} grant{'s' if grants != 1 else ''} of {size})"
+    return text
 
 
 CLUSTER_PREFIXES = [
@@ -272,7 +310,7 @@ def main():
             print(f"ERROR: the GitHub mirror is not reachable either ({e}). No verified calls available.")
             sys.exit(1)
     for c in calls:
-        c["budget"] = parse_budget(c.pop("budget_raw"))
+        c["budget"] = parse_budget(c.pop("budget_raw"), c["identifier"])
         c["cluster"] = cluster(c["identifier"])
     calls.sort(key=lambda c: (c["deadline"] or "9999"))
 

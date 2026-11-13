@@ -28,6 +28,12 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
+for _stream in (sys.stdout, sys.stderr):  # Windows consoles default to cp1252 and crash on EU text
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 EU_BLUE = colors.HexColor("#003399")
 MID_BLUE = colors.HexColor("#1A4A8C")
 DARK_BLUE = colors.HexColor("#1A3A7A")
@@ -193,5 +199,9 @@ def verify(out_path):
 
 if __name__ == "__main__":
     data = json.load(open(sys.argv[1], encoding="utf-8"))
+    # A JSON copied from the theme cache has no researcher-specific fields; they must be written fresh.
+    missing = [k for k in ("researcher", "institution", "gaps", "targets", "strategic_assessment") if not data.get(k)]
+    if missing:
+        sys.exit("Fill in these researcher-specific fields in the JSON before rendering: " + ", ".join(missing))
     build(data, sys.argv[2])
     verify(sys.argv[2])

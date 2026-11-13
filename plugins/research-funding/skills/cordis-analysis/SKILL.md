@@ -16,8 +16,8 @@ python "<skill-dir>/scripts/theme_cache.py" --root "<workspace>/themes" \
     resolve "kw1" "kw2" ... --cluster HORIZON-CL6
 ```
 
-- **exit 0 (FRESH)** — `fetch --kind cordis --out "researchers/[Name]/cordis/[name]-cordis-[YYYY-MM-DD].md"`, then append/replace only the researcher-specific sections (GEOGRAPHIC GAP ANALYSIS, KEY CONTACTS, STRATEGIC ASSESSMENT) and regenerate the PDF. Skip Step 1 entirely.
-- **exit 3 / exit 4** — run the full analysis below, then `store --slug <slug> --kind cordis` (both `.md` and the report JSON); register a new subtheme with `new` if there was no match.
+- **exit 0 (FRESH)** — `fetch --kind cordis --out "researchers/[Name]/cordis/[name]-cordis-[YYYY-MM-DD].md"`, then write the researcher-specific sections fresh (GEOGRAPHIC GAP ANALYSIS, WARM CONTACT LEADS, KEY CONTACTS, STRATEGIC ASSESSMENT; in the copied JSON: `researcher`, `institution`, `gaps`, `targets`, `strategic_assessment`). The cache never holds them: `store` removes them and any researcher name by itself and regenerate the PDF. Skip Step 1 entirely.
+- **exit 3 / exit 4** — run the full analysis below, then `store --slug <slug> --kind cordis` (both `.md` and the report JSON); register a new subtheme with `new` if there was no match. Pass `--researcher "[Name]"` to `store`. Write the theme sections (TYPICAL WINNER PROFILE, TOP COORDINATOR CANDIDATES, MATTHEW EFFECT, EU POLICY ALIGNMENT, WP OUTPUT PATTERNS) without naming the researcher, their institution or their projects, because the next researcher in the subtheme gets the same text. A theme is only reused when at least two of the query keywords, and 40% of them, match it.
 
 ## Step 1 — Run the data layer
 
@@ -37,7 +37,7 @@ python "<skill-dir>/scripts/analyse_cordis.py" \
 
 The script does all joins (projects, organisations, topics, policyPriorities, deliverables, publications) and computes per organisation: projects-in-topic, coordinator count, EC contribution in topic, total HEU projects (EU experience), relevance ratio, power-broker flag (≥100 projects); plus country distribution with under-representation flag, policy-flag percentages, deliverable-type patterns, and publication-based warm-lead candidates. It prints a compact summary; detail is in the JSON.
 
-If cordis.europa.eu is blocked, `download_cordis.py` uses the repository's weekly GitHub mirror of the same extracts by itself; the analysis is identical, so run it normally. Only if it exits 1 (both unreachable and no local copy) fall back to web search on cordis.europa.eu and prefix the output with: "⚠️ Based on web search — CORDIS bulk data could not be downloaded." In the status message, add the fix from `python "${CLAUDE_PLUGIN_ROOT}/scripts/check_network.py"` (the text between its `USER MESSAGE` lines, in the user's language). In the status message, state the CORDIS source and data date from `cordis-data/SOURCE.txt`.
+If cordis.europa.eu is blocked, `download_cordis.py` uses the repository's weekly GitHub mirror of the same extracts by itself; the analysis is identical, so run it normally. Only if it exits 1 (both unreachable and no local copy) fall back to web search on cordis.europa.eu and prefix the output with: "⚠️ Based on web search — CORDIS bulk data could not be downloaded." In the status message, add the fix from `python "${CLAUDE_PLUGIN_ROOT}/scripts/check_network.py"` (the plugin's top-level `scripts/` folder, two levels above this skill's folder) (the text between its `USER MESSAGE` lines, in the user's language). In the status message, state the CORDIS source and data date from `cordis-data/SOURCE.txt`.
 
 ## Step 2 — Interpret (the judgment steps)
 
@@ -45,7 +45,7 @@ From the script output plus targeted web searches:
 
 1. **Typical winner profile** — 2–3 sentences on the consortium type that wins here.
 2. **Top coordinator candidates (3–5)** — prefer high relevance ratio (specialists) or power brokers. For power brokers note: "difficult to out-compete as coordinator — approach as partner instead."
-3. **Geographic argument** — if the researcher's country is <10% of consortia, formulate it explicitly ("DK appears in only X% — balance logic favours adding a Danish partner").
+3. **Geographic argument** — use it **only** when the script prints `UNDERREPRESENTED` for the researcher's country (`geography.home_underrepresented` is true). The script compares the country's share of consortia in this theme with its share of all Horizon Europe consortia (3+ partners), so small countries are not flagged by default. Quote both numbers ("DK is in X% of consortia in this theme against Y% across Horizon Europe"). Otherwise write one line saying the country is not underrepresented, and leave geography out of the strategic assessment, the pitch letters and the HTML report.
 4. **Consortium gap** — which WP types smaller partners lead (from deliverable-type patterns), what thematic/methodological gap the researcher fills, which policy flag to frame the pitch around.
 5. **Key contacts** — for each top candidate, web-search the project website/LinkedIn/institution for the PI or coordinator. Table: Name | Role | Institution | Contact | Source. Publicly available info only.
 
