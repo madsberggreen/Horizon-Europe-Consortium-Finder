@@ -8,7 +8,9 @@ Run only when the user asks. Finds researcher folders that have not been process
 
 ## Phases
 
-**0. CORDIS data check** — run `python "${CLAUDE_PLUGIN_ROOT}/skills/cordis-analysis/scripts/download_cordis.py" --data-dir "<workspace>/cordis-data"` (the script sits in the `cordis-analysis` skill's `scripts/` folder). It refreshes the CORDIS extracts when older than 30 days and otherwise does nothing.
+**0. Network check** — run `python "${CLAUDE_PLUGIN_ROOT}/scripts/check_network.py"` (the plugin's top-level `scripts/` folder). On exit 2 (BLOCKED), stop and give the user the text between the `USER MESSAGE` lines in their language, as `/add-researcher` step 0 describes. On exit 0, continue.
+
+**0b. CORDIS data check** — run `python "${CLAUDE_PLUGIN_ROOT}/skills/cordis-analysis/scripts/download_cordis.py" --data-dir "<workspace>/cordis-data"` (the script sits in the `cordis-analysis` skill's `scripts/` folder). It refreshes the CORDIS extracts when older than 30 days and otherwise does nothing.
 
 **1. New researchers** — for each folder under `researchers/` (except `_template`) without a `profile/` folder: create the standard folder structure and run the `/add-researcher` pipeline from step 2 onward. If the researcher cannot be identified unambiguously, leave the template, note it in the status message, and skip to the next researcher.
 

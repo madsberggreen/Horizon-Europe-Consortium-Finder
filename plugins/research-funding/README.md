@@ -1,8 +1,16 @@
-# Horizon Europe Consortium Finder v3.0.0
+# Horizon Europe Consortium Finder v3.1.0
 
 Technical name `horizon-europe-consortium-finder` (before v3.0.0: `research-funding`).
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v3.1.0
+
+- **Network check before anything else.** New `scripts/check_network.py` tests the GitHub data copy, the EU call search, CORDIS, ORCID, the Python package index and the required Python packages, in parallel, in about a second. It answers READY or BLOCKED.
+- **`/start` checks right after showing the form.** If Claude can't reach the data, the user gets step-by-step instructions (where the setting is, which domains to allow, what to ask an admin) before filling in the form, instead of a failed run 10 minutes later.
+- **`/add-researcher` and `/update-profiles` stop at once when blocked**, before building the profile, and give the same instructions in the user's language. Call matching and CORDIS failures later in a run point to the same instructions.
+- ORCID being blocked is now a warning, not a silent gap: the profile says it was built without ORCID.
+- The repository README has a "Before first use" section with the domain list.
 
 ## What changed in v3.0.0
 

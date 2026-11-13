@@ -15,7 +15,10 @@ The complete form is embedded at the bottom of this file. **Do not search for an
    - `title`: `consortium_finder_form`
    - `loading_messages`: `["Laying out the form"]`
    - `widget_code`: everything between the lines `<!-- FORM START -->` and `<!-- FORM END -->` below, copied **verbatim**. Never rewrite, shorten, translate or restyle it.
-3. Write nothing after the call. Wait for the user's next message.
+3. Right after the form is shown, check the network so the user hears about a blocked setting before filling in the form: run `python "${CLAUDE_PLUGIN_ROOT}/scripts/check_network.py" --quiet` (the plugin's top-level `scripts/` folder).
+   - **Exit 0:** write nothing. Wait for the user's next message.
+   - **Exit 2:** write one line — "Before you press the button: Claude can't reach the internet yet, so the search would stop. Here's how to fix it:" — then the text between the `USER MESSAGE` lines, translated into the user's language, as a numbered list with the domain names in a code block. Then wait.
+   - If commands can't be run here, write nothing; the pipeline reports it later.
 
 Do **not** create an artifact or a file for the form: only the inline widget can send the request back to the chat.
 
@@ -23,7 +26,7 @@ If — and only if — there is no `show_widget` tool, ask in plain text for nam
 
 ## When the request arrives
 
-The form's message starts with `Find me a consortium!` followed by `Mode:`, `Name:`, `Institution:`, `Requested by:` (`Advisor` or `Researcher`), optional `ORCID:`, and in Advanced mode `Research idea:` / `Document:` blocks between `<<<` and `>>>`. Treat it as an `/add-researcher` request in that format and run the full `add-researcher` pipeline of this plugin (the `add-researcher` command or skill), starting at step 0, without asking for confirmation. Documents the user attached in the chat instead (plain-text fallback) count as `Document:` blocks.
+The form's message starts with `Find me a consortium!` followed by `Mode:`, `Name:`, `Institution:`, `Requested by:` (`Advisor` or `Researcher`), optional `ORCID:`, and in Advanced mode `Research idea:` / `Document:` blocks between `<<<` and `>>>`. Treat it as an `/add-researcher` request in that format and run the full `add-researcher` pipeline of this plugin (the `add-researcher` command or skill), starting at step 0 (network check), without asking for confirmation. Run the network check again even if it already ran when the form was shown: the user may have changed the setting since. Documents the user attached in the chat instead (plain-text fallback) count as `Document:` blocks.
 
 Where there is no persistent workspace folder (for example a regular chat), work in the current working directory and give the user the HTML report and PDFs as downloadable files at the end.
 

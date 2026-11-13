@@ -32,6 +32,27 @@ Delivered as a Claude plugin, `horizon-europe-consortium-finder` (called `resear
 
 If your organization restricts which marketplaces you may add, ask your Claude administrator to allow this repository or to add the plugin for everyone.
 
+## Before first use: let Claude reach the data
+
+The plugin fetches open calls and EU project data from the internet while it works. If Claude's network access is turned off, the search stops. When you type `/start`, Claude checks this in a few seconds and tells you exactly what to change, so you won't lose a run to it.
+
+To set it up in advance:
+
+1. In Claude, open **Settings** → **Capabilities**.
+2. Under **Code execution and file creation**, turn on network access (**Allow network egress**).
+3. Add these domains to the allowed list:
+   ```
+   raw.githubusercontent.com
+   api.tech.ec.europa.eu
+   ec.europa.eu
+   cordis.europa.eu
+   pub.orcid.org
+   ```
+   `raw.githubusercontent.com` alone is enough: it holds a weekly copy of the EU data. The others give live data and ORCID publication lists. If the added domains don't take effect, choose **All domains** instead.
+4. **Organisation accounts (Team or Enterprise):** only an owner or admin can change this, under **Organization settings** → **Capabilities**. Send them the list above.
+
+Claude Code on your own computer usually has network access already.
+
 ## Use
 
 **Type `/start` in Claude.** A form appears in the chat. Choose **Simple search** (name, institution, optional ORCID iD; public data only) or **Advanced search** (adds your research idea and documents such as rejected applications or one-pagers), fill it in and press **Find me a consortium!**. Claude then generates the reports. In Advanced mode your input shapes the profile, the call matching, the policy briefing and the pitch letters. Documents are read in your browser and only reach Claude when you press the button.

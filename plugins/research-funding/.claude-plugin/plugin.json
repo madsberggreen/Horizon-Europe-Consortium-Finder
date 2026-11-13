@@ -1,7 +1,7 @@
 {
   "name": "horizon-europe-consortium-finder",
   "displayName": "Horizon Europe Consortium Finder",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Horizon Europe Consortium Finder. Identifies funding opportunities in Horizon Europe, matches them to researcher profiles, and generates Proposal Intelligence reports and consortium pitch materials.",
   "author": {
     "name": "Mads Lykke Berggreen (madsberggreen)",

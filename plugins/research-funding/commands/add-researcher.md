@@ -34,7 +34,12 @@ extracted text
 
 ## Pipeline (this order is deliberate — PI runs AFTER matching so it anchors on real calls)
 
-**0. CORDIS data check** — before anything else, run `python "${CLAUDE_PLUGIN_ROOT}/skills/cordis-analysis/scripts/download_cordis.py" --data-dir "<workspace>/cordis-data"` (the script sits in the `cordis-analysis` skill's `scripts/` folder). It downloads the official CORDIS extracts on first use and refreshes them when older than 30 days, using the repository's GitHub mirror when cordis.europa.eu is blocked; otherwise it does nothing. Never ask the user to update CORDIS files by hand. If it exits 1, continue — step 5 falls back to web search.
+**0. Network check** — before anything else, run `python "${CLAUDE_PLUGIN_ROOT}/scripts/check_network.py"` (the script sits in the plugin's top-level `scripts/` folder). It takes a few seconds.
+- **Exit 0 (READY):** continue. Act on any `WARNING:` lines (for example: ORCID blocked → build the profile from institutional pages and say so; missing packages → install them).
+- **Exit 2 (BLOCKED):** stop the whole run here — do not create folders or start the profile, because nothing after it can finish. Give the user the text between `----- USER MESSAGE -----` and `----- END USER MESSAGE -----`, translated into the user's language, with the steps as a numbered list and the domain names unchanged in a code block so they can be copied. Add nothing else.
+- If commands can't be run at all in this environment, tell the user the plugin needs code execution with network access, and give the same steps.
+
+**0b. CORDIS data check** — then run `python "${CLAUDE_PLUGIN_ROOT}/skills/cordis-analysis/scripts/download_cordis.py" --data-dir "<workspace>/cordis-data"` (the script sits in the `cordis-analysis` skill's `scripts/` folder). It downloads the official CORDIS extracts on first use and refreshes them when older than 30 days, using the repository's GitHub mirror when cordis.europa.eu is blocked; otherwise it does nothing. Never ask the user to update CORDIS files by hand. If it exits 1, continue — step 5 falls back to web search.
 
 **1. Folders** — create `researchers/[Name]/{inbox,profile,calls,cordis,intelligence,pitches,reports}/`; copy `researchers/_template/profil.md` in and set the name. If the workspace has no `researchers/_template/profil.md`, create it first from `templates/profil.md` in the `researcher-profiling` skill's folder. **Advanced mode:** save the research idea and every document block verbatim to `inbox/user-input-[YYYY-MM-DD].md` (header `# User input — [Name]` / `_Mode: Advanced | Received: [date]_`, then `## Research idea` and one `## Document: [file name]` section per document).
 
