@@ -5,7 +5,7 @@ Delivered as a Claude plugin, `horizon-europe-consortium-finder` (called `resear
 
 ## How it works
 
-![The Horizon Europe funding pipeline: six skills that work as a crew, from Profile Builder to Briefing Reporter](docs/how-it-works.png)
+![Horizon Europe Consortium Finder: six skills that work as a crew, from Profile Builder to Briefing Reporter](docs/how-it-works.png)
 
 You fill in one form. Six skills then work through the search one after another, each building on the one before:
 
