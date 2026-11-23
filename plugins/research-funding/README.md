@@ -1,8 +1,12 @@
-# Horizon Europe Consortium Finder v3.1.0
+# Horizon Europe Consortium Finder v3.2.0
 
 Technical name `horizon-europe-consortium-finder` (before v3.0.0: `research-funding`).
 
 Consolidated Horizon Europe pipeline — single source of truth replacing both the old plugin (v1.3.0) and the standalone skill copies.
+
+## What changed in v3.2.0
+
+- **"How does it work?" link in the `/start` form.** It opens the new "How it works" section of the repository README, with the pipeline illustration (`docs/how-it-works.png`) and a short explanation of the six steps.
 
 ## What changed in v3.1.0
 

@@ -3,6 +3,21 @@ App that helps you identify and join a Horizon Europe consortium as a researcher
 
 Delivered as a Claude plugin, `horizon-europe-consortium-finder` (called `research-funding` before version 3.0.0). For a named researcher it builds a funding profile, matches open Horizon Europe calls, writes a Proposal Intelligence briefing, finds consortium partners in CORDIS, drafts work package lead pitch letters and combines everything in one HTML report.
 
+## How it works
+
+![The Horizon Europe funding pipeline: six skills that work as a crew, from Profile Builder to Briefing Reporter](docs/how-it-works.png)
+
+You fill in one form. Six skills then work through the search one after another, each building on the one before:
+
+1. **Profile Builder** reads the researcher's public record (ORCID, the institution's research portal and web pages) and writes a funding profile with research areas, methods and keywords.
+2. **Funding Scout** searches all open and forthcoming Horizon Europe calls on the EU Funding and Tenders Portal and scores each one against the profile. The best matches go on a shortlist.
+3. **Policy Analyst** maps the EU policy landscape around the shortlisted calls: key policy documents, expert networks such as COST Actions, related projects and upcoming brokerage events.
+4. **Consortium Builder** analyses CORDIS, the EU's database of funded projects, to find out which organisations win in this area and which of them could coordinate a bid.
+5. **Pitch Crafter** drafts a short letter from the researcher to each of the three best coordinator candidates, offering to lead a work package.
+6. **Briefing Reporter** collects everything in one HTML report with an action plan.
+
+A full run takes 15–30 minutes. The pitch letters are drafts: nothing is sent on your behalf.
+
 ## Install
 
 **Claude Code** (type in the chat):

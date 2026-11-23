@@ -46,6 +46,7 @@ Where there is no persistent workspace folder (for example a regular chat), work
 .cf-file{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:0.5px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:13px}
 </style>
 <div class="cf">
+  <a href="https://github.com/madsberggreen/Horizon-Europe-Consortium-Finder#how-it-works" target="_blank" rel="noopener" style="justify-self:end;display:inline-flex;gap:6px;align-items:center;font-size:14px;color:var(--text-accent);text-decoration:none;margin-bottom:-0.5rem"><i class="ti ti-info-circle" style="font-size:16px" aria-hidden="true"></i>How does it work? ↗</a>
   <div class="cf-switch" role="group" aria-label="Search type">
     <button type="button" id="cf-simple" aria-pressed="true">Simple search</button>
     <button type="button" id="cf-adv" aria-pressed="false">Advanced search</button>
